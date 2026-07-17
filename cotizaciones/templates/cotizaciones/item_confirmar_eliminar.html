@@ -1,0 +1,55 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Eliminar ítem | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>Eliminar ítem</h1>
+
+        <p>
+            Confirma la eliminación del ítem seleccionado.
+        </p>
+    </div>
+
+    <div class="panel panel-confirmacion">
+
+        <h2>{{ item.descripcion }}</h2>
+
+        <p>
+            Este ítem pertenece a la cotización
+            <strong>{{ item.cotizacion.numero }}</strong>.
+        </p>
+
+        <p class="advertencia">
+            Esta acción no se puede deshacer.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="acciones-formulario">
+
+                <button
+                    type="submit"
+                    class="boton boton-peligro"
+                >
+                    Sí, eliminar
+                </button>
+
+                <a
+                    href="{% url 'cotizaciones:cotizacion_detalle' item.cotizacion.pk %}"
+                    class="boton boton-secundario"
+                >
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+{% endblock %}

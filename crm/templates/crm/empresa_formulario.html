@@ -1,0 +1,89 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ titulo }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>{{ titulo }}</h1>
+
+        <p>
+            Completa los datos comerciales y de contacto.
+        </p>
+    </div>
+
+    <div class="panel formulario">
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                {{ form.non_field_errors }}
+            {% endif %}
+
+            <div class="form-grid">
+
+                {% for field in form %}
+
+                    <div
+                        class="campo
+                        {% if field.name == 'observaciones' %}
+                            campo-completo
+                        {% endif %}"
+                    >
+
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+
+                            {% if field.field.required %}
+                                *
+                            {% endif %}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small>
+                                {{ field.help_text }}
+                            </small>
+                        {% endif %}
+
+                        {{ field.errors }}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="acciones-formulario">
+
+                <button type="submit" class="boton">
+                    {{ texto_boton }}
+                </button>
+
+                {% if empresa %}
+                    <a
+                        href="{% url 'crm:empresa_detalle' empresa.pk %}"
+                        class="boton boton-secundario"
+                    >
+                        Cancelar
+                    </a>
+                {% else %}
+                    <a
+                        href="{% url 'crm:empresa_lista' %}"
+                        class="boton boton-secundario"
+                    >
+                        Cancelar
+                    </a>
+                {% endif %}
+
+            </div>
+
+        </form>
+
+    </div>
+
+{% endblock %}

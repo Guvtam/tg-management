@@ -1,0 +1,143 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Contactos | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>Contactos</h1>
+        <p>
+            Personas relacionadas con prospectos, clientes,
+            proveedores y partners.
+        </p>
+    </div>
+
+    <div class="acciones">
+
+        <form method="get" class="buscador">
+            <input
+                type="text"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="Buscar por nombre, empresa, cargo o correo"
+            >
+
+            <button type="submit" class="boton">
+                Buscar
+            </button>
+
+            {% if busqueda %}
+                <a
+                    href="{% url 'crm:contacto_lista' %}"
+                    class="boton boton-secundario"
+                >
+                    Limpiar
+                </a>
+            {% endif %}
+        </form>
+
+        <a
+            href="{% url 'crm:contacto_crear' %}"
+            class="boton"
+        >
+            Nuevo contacto
+        </a>
+
+    </div>
+
+    <div class="panel">
+
+        {% if contactos %}
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Contacto</th>
+                            <th>Empresa</th>
+                            <th>Cargo</th>
+                            <th>Correo</th>
+                            <th>Teléfono</th>
+                            <th>Principal</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for contacto in contactos %}
+                            <tr>
+                                <td>
+                                    <a
+                                        href="{% url 'crm:contacto_detalle' contacto.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ contacto }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <a
+                                        href="{% url 'crm:empresa_detalle' contacto.empresa.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ contacto.empresa }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ contacto.cargo|default:"—" }}
+                                </td>
+
+                                <td>
+                                    {{ contacto.email|default:"—" }}
+                                </td>
+
+                                <td>
+                                    {{ contacto.telefono|default:"—" }}
+                                </td>
+
+                                <td>
+                                    {% if contacto.es_contacto_principal %}
+                                        <span class="estado">
+                                            Principal
+                                        </span>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if contacto.activo %}
+                                        <span class="estado">
+                                            Activo
+                                        </span>
+                                    {% else %}
+                                        <span class="estado estado-inactivo">
+                                            Inactivo
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="sin-registros">
+                {% if busqueda %}
+                    No se encontraron contactos para
+                    “{{ busqueda }}”.
+                {% else %}
+                    Todavía no existen contactos registrados.
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

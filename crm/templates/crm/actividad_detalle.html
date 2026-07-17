@@ -1,0 +1,134 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ actividad.asunto }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="acciones">
+
+        <div class="encabezado-pagina">
+            <h1>{{ actividad.asunto }}</h1>
+
+            <p>
+                Detalle y resultado del seguimiento comercial.
+            </p>
+        </div>
+
+        <div class="grupo-botones">
+
+            {% if actividad.estado != "Completada" %}
+
+                <form
+                    method="post"
+                    action="{% url 'crm:actividad_completar' actividad.pk %}"
+                    class="formulario-inline"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="boton boton-exito"
+                    >
+                        Marcar completada
+                    </button>
+                </form>
+
+            {% endif %}
+
+            <a
+                href="{% url 'crm:actividad_editar' actividad.pk %}"
+                class="boton"
+            >
+                Editar actividad
+            </a>
+
+            <a
+                href="{% url 'crm:actividad_lista' %}"
+                class="boton boton-secundario"
+            >
+                Volver
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="detalle-grid">
+
+            <div class="detalle-item">
+                <p>Oportunidad</p>
+
+                <strong>
+                    <a
+                        href="{% url 'crm:oportunidad_detalle' actividad.oportunidad.pk %}"
+                        class="enlace-tabla"
+                    >
+                        {{ actividad.oportunidad.titulo }}
+                    </a>
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Empresa</p>
+
+                <strong>
+                    <a
+                        href="{% url 'crm:empresa_detalle' actividad.oportunidad.empresa.pk %}"
+                        class="enlace-tabla"
+                    >
+                        {{ actividad.oportunidad.empresa }}
+                    </a>
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Tipo</p>
+                <strong>{{ actividad.get_tipo_display }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Estado</p>
+                <strong>{{ actividad.get_estado_display }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Fecha programada</p>
+
+                <strong>
+                    {{ actividad.fecha_programada|date:"d-m-Y H:i" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Responsable</p>
+
+                <strong>
+                    {{ actividad.responsable|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Descripción</p>
+
+                <strong>
+                    {{ actividad.descripcion|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Resultado</p>
+
+                <strong>
+                    {{ actividad.resultado|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

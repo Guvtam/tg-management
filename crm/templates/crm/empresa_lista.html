@@ -1,0 +1,117 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Empresas | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>Empresas</h1>
+        <p>
+            Gestión de prospectos, clientes, proveedores y partners.
+        </p>
+    </div>
+
+    <div class="acciones">
+
+        <form method="get" class="buscador">
+            <input
+                type="text"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="Buscar por nombre, RUT, comuna o rubro"
+            >
+
+            <button type="submit" class="boton">
+                Buscar
+            </button>
+
+            {% if busqueda %}
+                <a
+                    href="{% url 'crm:empresa_lista' %}"
+                    class="boton boton-secundario"
+                >
+                    Limpiar
+                </a>
+            {% endif %}
+        </form>
+
+        <a
+            href="{% url 'crm:empresa_crear' %}"
+            class="boton"
+        >
+            Nueva empresa
+        </a>
+
+    </div>
+
+    <div class="panel">
+
+        {% if empresas %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>RUT</th>
+                        <th>Tipo</th>
+                        <th>Rubro</th>
+                        <th>Comuna</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for empresa in empresas %}
+                        <tr>
+                            <td>
+                                <a
+                                    href="{% url 'crm:empresa_detalle' empresa.pk %}"
+                                    class="enlace-tabla"
+                                >
+                                    {{ empresa }}
+                                </a>
+                            </td>
+
+                            <td>
+                                {{ empresa.rut|default:"—" }}
+                            </td>
+
+                            <td>
+                                {{ empresa.get_tipo_display }}
+                            </td>
+
+                            <td>
+                                {{ empresa.rubro|default:"—" }}
+                            </td>
+
+                            <td>
+                                {{ empresa.comuna|default:"—" }}
+                            </td>
+
+                            <td>
+                                <span class="estado">
+                                    {{ empresa.get_estado_display }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div class="sin-registros">
+                {% if busqueda %}
+                    No se encontraron empresas para “{{ busqueda }}”.
+                {% else %}
+                    Todavía no existen empresas registradas.
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Inicio | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>Panel general</h1>
+        <p>
+            Resumen comercial y operativo de TG Technology.
+        </p>
+    </div>
+
+    <div class="tarjetas">
+
+        <div class="tarjeta">
+            <p>Empresas registradas</p>
+            <strong>{{ total_empresas }}</strong>
+        </div>
+
+        <div class="tarjeta">
+            <p>Contactos</p>
+            <strong>{{ total_contactos }}</strong>
+        </div>
+
+        <div class="tarjeta">
+            <p>Oportunidades</p>
+            <strong>{{ total_oportunidades }}</strong>
+        </div>
+
+        <div class="tarjeta">
+            <p>Actividades pendientes</p>
+            <strong>{{ actividades_pendientes }}</strong>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <h2>Últimas oportunidades</h2>
+
+        {% if ultimas_oportunidades %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Oportunidad</th>
+                        <th>Empresa</th>
+                        <th>Etapa</th>
+                        <th>Prioridad</th>
+                        <th>Valor estimado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for oportunidad in ultimas_oportunidades %}
+                        <tr>
+                            <td>
+                                {{ oportunidad.titulo }}
+                            </td>
+
+                            <td>
+                                {{ oportunidad.empresa }}
+                            </td>
+
+                            <td>
+                                <span class="estado">
+                                    {{ oportunidad.get_etapa_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ oportunidad.get_prioridad_display }}
+                            </td>
+
+                            <td>
+                                ${{ oportunidad.valor_estimado|floatformat:0 }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div class="sin-registros">
+                Todavía no existen oportunidades registradas.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

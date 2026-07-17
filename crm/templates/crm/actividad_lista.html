@@ -1,0 +1,168 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Actividades | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>Actividades</h1>
+
+        <p>
+            Seguimiento de reuniones, llamadas, correos y tareas comerciales.
+        </p>
+    </div>
+
+    <div class="acciones">
+
+        <form method="get" class="filtros">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="Buscar actividad, oportunidad o empresa"
+            >
+
+            <select name="tipo">
+                <option value="">Todos los tipos</option>
+
+                {% for valor, etiqueta in tipos %}
+                    <option
+                        value="{{ valor }}"
+                        {% if tipo_seleccionado == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="estado">
+                <option value="">Todos los estados</option>
+
+                {% for valor, etiqueta in estados %}
+                    <option
+                        value="{{ valor }}"
+                        {% if estado_seleccionado == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="boton">
+                Filtrar
+            </button>
+
+            {% if busqueda or tipo_seleccionado or estado_seleccionado %}
+                <a
+                    href="{% url 'crm:actividad_lista' %}"
+                    class="boton boton-secundario"
+                >
+                    Limpiar
+                </a>
+            {% endif %}
+
+        </form>
+
+        <a
+            href="{% url 'crm:actividad_crear' %}"
+            class="boton"
+        >
+            Nueva actividad
+        </a>
+
+    </div>
+
+    <div class="panel">
+
+        {% if actividades %}
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Actividad</th>
+                            <th>Oportunidad</th>
+                            <th>Empresa</th>
+                            <th>Tipo</th>
+                            <th>Fecha programada</th>
+                            <th>Responsable</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for actividad in actividades %}
+                            <tr>
+                                <td>
+                                    <a
+                                        href="{% url 'crm:actividad_detalle' actividad.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ actividad.asunto }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <a
+                                        href="{% url 'crm:oportunidad_detalle' actividad.oportunidad.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ actividad.oportunidad.titulo }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ actividad.oportunidad.empresa }}
+                                </td>
+
+                                <td>
+                                    {{ actividad.get_tipo_display }}
+                                </td>
+
+                                <td>
+                                    {{ actividad.fecha_programada|date:"d-m-Y H:i" }}
+                                </td>
+
+                                <td>
+                                    {{ actividad.responsable|default:"—" }}
+                                </td>
+
+                                <td>
+                                    {% if actividad.estado == "Completada" %}
+                                        <span class="estado estado-completado">
+                                            {{ actividad.get_estado_display }}
+                                        </span>
+                                    {% elif actividad.estado == "Cancelada" %}
+                                        <span class="estado estado-inactivo">
+                                            {{ actividad.get_estado_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="estado estado-pendiente">
+                                            {{ actividad.get_estado_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="sin-registros">
+                No se encontraron actividades.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

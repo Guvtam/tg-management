@@ -1,0 +1,94 @@
+from django.urls import path
+
+from . import views
+
+
+app_name = "crm"
+
+urlpatterns = [
+    path(
+        "empresas/",
+        views.empresa_lista,
+        name="empresa_lista",
+    ),
+    path(
+        "empresas/nueva/",
+        views.empresa_crear,
+        name="empresa_crear",
+    ),
+    path(
+        "empresas/<int:pk>/",
+        views.empresa_detalle,
+        name="empresa_detalle",
+    ),
+    path(
+        "empresas/<int:pk>/editar/",
+        views.empresa_editar,
+        name="empresa_editar",
+    ),
+    path(
+        "contactos/",
+        views.contacto_lista,
+        name="contacto_lista",
+    ),
+    path(
+        "contactos/nuevo/",
+        views.contacto_crear,
+        name="contacto_crear",
+    ),
+    path(
+        "contactos/<int:pk>/",
+        views.contacto_detalle,
+        name="contacto_detalle",
+    ),
+    path(
+        "contactos/<int:pk>/editar/",
+        views.contacto_editar,
+        name="contacto_editar",
+    ),
+    path(
+    "oportunidades/",
+    views.oportunidad_lista,
+    name="oportunidad_lista",
+    ),
+    path(
+        "oportunidades/nueva/",
+        views.oportunidad_crear,
+        name="oportunidad_crear",
+    ),
+    path(
+        "oportunidades/<int:pk>/",
+        views.oportunidad_detalle,
+        name="oportunidad_detalle",
+    ),
+    path(
+        "oportunidades/<int:pk>/editar/",
+        views.oportunidad_editar,
+        name="oportunidad_editar",
+    ),
+    path(
+    "actividades/",
+    views.actividad_lista,
+    name="actividad_lista",
+    ),
+    path(
+        "actividades/nueva/",
+        views.actividad_crear,
+        name="actividad_crear",
+    ),
+    path(
+        "actividades/<int:pk>/",
+        views.actividad_detalle,
+        name="actividad_detalle",
+    ),
+    path(
+        "actividades/<int:pk>/editar/",
+        views.actividad_editar,
+        name="actividad_editar",
+    ),
+    path(
+        "actividades/<int:pk>/completar/",
+        views.actividad_completar,
+        name="actividad_completar",
+    ),
+]

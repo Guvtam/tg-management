@@ -1,0 +1,133 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ contacto }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="acciones">
+
+        <div class="encabezado-pagina">
+            <h1>{{ contacto }}</h1>
+
+            <p>
+                Información del contacto y empresa asociada.
+            </p>
+        </div>
+
+        <div class="grupo-botones">
+            <a
+                href="{% url 'crm:contacto_editar' contacto.pk %}"
+                class="boton"
+            >
+                Editar contacto
+            </a>
+
+            <a
+                href="{% url 'crm:contacto_lista' %}"
+                class="boton boton-secundario"
+            >
+                Volver
+            </a>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="detalle-grid">
+
+            <div class="detalle-item">
+                <p>Nombre</p>
+                <strong>{{ contacto.nombres }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Apellidos</p>
+                <strong>{{ contacto.apellidos }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Empresa</p>
+
+                <strong>
+                    <a
+                        href="{% url 'crm:empresa_detalle' contacto.empresa.pk %}"
+                        class="enlace-tabla"
+                    >
+                        {{ contacto.empresa }}
+                    </a>
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Cargo</p>
+                <strong>{{ contacto.cargo|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Correo electrónico</p>
+
+                {% if contacto.email %}
+                    <strong>
+                        <a href="mailto:{{ contacto.email }}">
+                            {{ contacto.email }}
+                        </a>
+                    </strong>
+                {% else %}
+                    <strong>—</strong>
+                {% endif %}
+            </div>
+
+            <div class="detalle-item">
+                <p>Teléfono</p>
+
+                {% if contacto.telefono %}
+                    <strong>
+                        <a href="tel:{{ contacto.telefono }}">
+                            {{ contacto.telefono }}
+                        </a>
+                    </strong>
+                {% else %}
+                    <strong>—</strong>
+                {% endif %}
+            </div>
+
+            <div class="detalle-item">
+                <p>Contacto principal</p>
+
+                <strong>
+                    {% if contacto.es_contacto_principal %}
+                        Sí
+                    {% else %}
+                        No
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Estado</p>
+
+                <strong>
+                    {% if contacto.activo %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Observaciones</p>
+
+                <strong>
+                    {{ contacto.observaciones|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

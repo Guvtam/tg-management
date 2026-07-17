@@ -1,0 +1,173 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Cotizaciones | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>Cotizaciones</h1>
+
+        <p>
+            Administración de propuestas económicas y condiciones comerciales.
+        </p>
+    </div>
+
+    <div class="acciones">
+
+        <form method="get" class="filtros">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="Buscar número, empresa u oportunidad"
+            >
+
+            <select name="estado">
+                <option value="">Todos los estados</option>
+
+                {% for valor, etiqueta in estados %}
+                    <option
+                        value="{{ valor }}"
+                        {% if estado_seleccionado == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="moneda">
+                <option value="">Todas las monedas</option>
+
+                {% for valor, etiqueta in monedas %}
+                    <option
+                        value="{{ valor }}"
+                        {% if moneda_seleccionada == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="boton">
+                Filtrar
+            </button>
+
+            {% if busqueda or estado_seleccionado or moneda_seleccionada %}
+                <a
+                    href="{% url 'cotizaciones:cotizacion_lista' %}"
+                    class="boton boton-secundario"
+                >
+                    Limpiar
+                </a>
+            {% endif %}
+
+        </form>
+
+        <a
+            href="{% url 'cotizaciones:cotizacion_crear' %}"
+            class="boton"
+        >
+            Nueva cotización
+        </a>
+
+    </div>
+
+    <div class="panel">
+
+        {% if cotizaciones %}
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Empresa</th>
+                            <th>Oportunidad</th>
+                            <th>Emisión</th>
+                            <th>Vencimiento</th>
+                            <th>Estado</th>
+                            <th>Moneda</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for cotizacion in cotizaciones %}
+                            <tr>
+                                <td>
+                                    <a
+                                        href="{% url 'cotizaciones:cotizacion_detalle' cotizacion.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ cotizacion.numero }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <a
+                                        href="{% url 'crm:empresa_detalle' cotizacion.oportunidad.empresa.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ cotizacion.oportunidad.empresa }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <a
+                                        href="{% url 'crm:oportunidad_detalle' cotizacion.oportunidad.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ cotizacion.oportunidad.titulo }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.fecha_emision|date:"d-m-Y" }}
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.fecha_vencimiento|date:"d-m-Y"|default:"—" }}
+                                </td>
+
+                                <td>
+                                    <span class="estado estado-{{ cotizacion.estado }}">
+                                        {{ cotizacion.get_estado_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.moneda }}
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.moneda }}
+                                    {{ cotizacion.total|floatformat:2 }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="sin-registros">
+                {% if busqueda %}
+                    No se encontraron cotizaciones para “{{ busqueda }}”.
+                {% else %}
+                    Todavía no existen cotizaciones registradas.
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,125 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            TG Management
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'core/css/styles.css' %}"
+    >
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+
+<body>
+    <div class="layout">
+
+        <aside class="sidebar">
+
+            <div class="marca">
+                <h1>TG Management</h1>
+                <p>Gestión comercial y proyectos</p>
+            </div>
+
+            <nav aria-label="Menú principal">
+                <ul class="menu">
+                    <li>
+                        <a href="{% url 'core:dashboard' %}">
+                            Inicio
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'crm:empresa_lista' %}">
+                            Empresas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'crm:contacto_lista' %}">
+                            Contactos
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'crm:oportunidad_lista' %}">
+                            Oportunidades
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'crm:actividad_lista' %}">
+                            Actividades
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'cotizaciones:cotizacion_lista' %}">
+                            Cotizaciones
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            Proyectos
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </aside>
+
+        <main class="contenido">
+
+            <header class="barra-superior">
+                <h2>TG Technology</h2>
+
+                <div class="usuario">
+                    Sistema de gestión
+                </div>
+            </header>
+
+            <section class="pagina">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div
+                            class="mensaje
+                            {% if message.tags == 'error' %}
+                                mensaje-error
+                            {% else %}
+                                mensaje-exito
+                            {% endif %}"
+                        >
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+
+            </section>
+
+        </main>
+
+    </div>
+
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>

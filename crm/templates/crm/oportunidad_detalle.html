@@ -1,0 +1,326 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ oportunidad.titulo }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="acciones">
+
+        <div class="encabezado-pagina">
+            <h1>{{ oportunidad.titulo }}</h1>
+
+            <p>
+                Información comercial y seguimiento de la oportunidad.
+            </p>
+        </div>
+
+        <div class="grupo-botones">
+            <a
+                href="{% url 'crm:oportunidad_editar' oportunidad.pk %}"
+                class="boton"
+            >
+                Editar oportunidad
+            </a>
+
+            <a
+                href="{% url 'crm:oportunidad_lista' %}"
+                class="boton boton-secundario"
+            >
+                Volver
+            </a>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="detalle-grid">
+
+            <div class="detalle-item">
+                <p>Empresa</p>
+
+                <strong>
+                    <a
+                        href="{% url 'crm:empresa_detalle' oportunidad.empresa.pk %}"
+                        class="enlace-tabla"
+                    >
+                        {{ oportunidad.empresa }}
+                    </a>
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Contacto</p>
+
+                {% if oportunidad.contacto %}
+                    <strong>
+                        <a
+                            href="{% url 'crm:contacto_detalle' oportunidad.contacto.pk %}"
+                            class="enlace-tabla"
+                        >
+                            {{ oportunidad.contacto }}
+                        </a>
+                    </strong>
+                {% else %}
+                    <strong>—</strong>
+                {% endif %}
+            </div>
+
+            <div class="detalle-item">
+                <p>Etapa</p>
+                <strong>{{ oportunidad.get_etapa_display }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Prioridad</p>
+                <strong>{{ oportunidad.get_prioridad_display }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Servicio de interés</p>
+                <strong>
+                    {{ oportunidad.servicio_interes|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Valor estimado</p>
+                <strong>
+                    ${{ oportunidad.valor_estimado|default:0|floatformat:0 }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Probabilidad</p>
+                <strong>
+                    {{ oportunidad.probabilidad|default:0 }}%
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Fecha estimada de cierre</p>
+                <strong>
+                    {{ oportunidad.fecha_estimada_cierre|date:"d-m-Y"|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Responsable</p>
+                <strong>
+                    {{ oportunidad.responsable|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Actividades asociadas</p>
+                <strong>{{ oportunidad.actividades.count }}</strong>
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Descripción</p>
+
+                <strong>
+                    {{ oportunidad.descripcion|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+            {% if oportunidad.motivo_perdida %}
+                <div class="detalle-item campo-completo">
+                    <p>Motivo de pérdida</p>
+
+                    <strong>
+                        {{ oportunidad.motivo_perdida|linebreaksbr }}
+                    </strong>
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="panel">
+        <div class="acciones">
+
+            <div>
+                <h2>Actividades asociadas</h2>
+                <p class="texto-secundario">
+                    Seguimientos registrados para esta oportunidad.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'crm:actividad_crear' %}?oportunidad={{ oportunidad.pk }}"
+                class="boton"
+            >
+                Nueva actividad
+            </a>
+
+        </div>
+
+        {% if oportunidad.actividades.all %}
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Actividad</th>
+                            <th>Tipo</th>
+                            <th>Fecha</th>
+                            <th>Responsable</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for actividad in oportunidad.actividades.all %}
+                            <tr>
+                                <td>
+                                    <a
+                                        href="{% url 'crm:actividad_detalle' actividad.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ actividad.asunto }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ actividad.get_tipo_display }}
+                                </td>
+
+                                <td>
+                                    {{ actividad.fecha_programada|date:"d-m-Y H:i" }}
+                                </td>
+
+                                <td>
+                                    {{ actividad.responsable|default:"—" }}
+                                </td>
+
+                                <td>
+                                    <span class="estado estado-{{ actividad.estado|lower }}">
+                                        {{ actividad.get_estado_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="sin-registros">
+                Esta oportunidad todavía no tiene actividades.
+            </div>
+
+        {% endif %}
+    </div>
+
+    <div class="panel">
+
+        <div class="acciones">
+
+            <div>
+                <h2>Cotizaciones asociadas</h2>
+
+                <p class="texto-secundario">
+                    Propuestas económicas vinculadas a esta oportunidad.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'cotizaciones:cotizacion_crear' %}?oportunidad={{ oportunidad.pk }}"
+                class="boton"
+            >
+                Nueva cotización
+            </a>
+
+        </div>
+
+        {% if oportunidad.cotizaciones.all %}
+
+            <div class="tabla-contenedor">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Fecha emisión</th>
+                            <th>Vencimiento</th>
+                            <th>Estado</th>
+                            <th>Moneda</th>
+                            <th>Total</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for cotizacion in oportunidad.cotizaciones.all %}
+
+                            <tr>
+
+                                <td>
+                                    <a
+                                        href="{% url 'cotizaciones:cotizacion_detalle' cotizacion.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ cotizacion.numero }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.fecha_emision|date:"d-m-Y" }}
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.fecha_vencimiento|date:"d-m-Y"|default:"—" }}
+                                </td>
+
+                                <td>
+                                    <span class="estado estado-{{ cotizacion.estado }}">
+                                        {{ cotizacion.get_estado_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.moneda }}
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.moneda }}
+                                    {{ cotizacion.total|floatformat:2 }}
+                                </td>
+
+                                <td>
+                                    <a
+                                        href="{% url 'cotizaciones:cotizacion_detalle' cotizacion.pk %}"
+                                        class="boton boton-secundario boton-pequeno"
+                                    >
+                                        Ver
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="sin-registros">
+                Esta oportunidad todavía no tiene cotizaciones.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

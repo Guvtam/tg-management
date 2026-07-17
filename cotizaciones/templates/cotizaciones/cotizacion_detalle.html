@@ -1,0 +1,384 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ cotizacion.numero }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="acciones">
+
+        <div class="encabezado-pagina">
+            <h1>{{ cotizacion.numero }}</h1>
+
+            <p>
+                Cotización asociada a
+                {{ cotizacion.oportunidad.empresa }}.
+            </p>
+        </div>
+
+        <div class="grupo-botones">
+
+            <a
+                href="{% url 'cotizaciones:item_crear' cotizacion.pk %}"
+                class="boton"
+            >
+                Agregar ítem
+            </a>
+
+            <a
+                href="{% url 'cotizaciones:cotizacion_editar' cotizacion.pk %}"
+                class="boton"
+            >
+                Editar cotización
+            </a>
+
+            <a
+                href="{% url 'cotizaciones:cotizacion_lista' %}"
+                class="boton boton-secundario"
+            >
+                Volver
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="detalle-grid">
+
+            <div class="detalle-item">
+                <p>Empresa</p>
+
+                <strong>
+                    <a
+                        href="{% url 'crm:empresa_detalle' cotizacion.oportunidad.empresa.pk %}"
+                        class="enlace-tabla"
+                    >
+                        {{ cotizacion.oportunidad.empresa }}
+                    </a>
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Oportunidad</p>
+
+                <strong>
+                    <a
+                        href="{% url 'crm:oportunidad_detalle' cotizacion.oportunidad.pk %}"
+                        class="enlace-tabla"
+                    >
+                        {{ cotizacion.oportunidad.titulo }}
+                    </a>
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Contacto</p>
+
+                {% if cotizacion.contacto %}
+                    <strong>
+                        <a
+                            href="{% url 'crm:contacto_detalle' cotizacion.contacto.pk %}"
+                            class="enlace-tabla"
+                        >
+                            {{ cotizacion.contacto }}
+                        </a>
+                    </strong>
+                {% else %}
+                    <strong>—</strong>
+                {% endif %}
+            </div>
+
+            <div class="detalle-item">
+                <p>Estado</p>
+
+                <strong>
+                    <span class="estado estado-{{ cotizacion.estado }}">
+                        {{ cotizacion.get_estado_display }}
+                    </span>
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Fecha de emisión</p>
+
+                <strong>
+                    {{ cotizacion.fecha_emision|date:"d-m-Y" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Fecha de vencimiento</p>
+
+                <strong>
+                    {{ cotizacion.fecha_vencimiento|date:"d-m-Y"|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Moneda</p>
+
+                <strong>
+                    {{ cotizacion.get_moneda_display }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Valor de la moneda</p>
+
+                <strong>
+                    ${{ cotizacion.valor_moneda|floatformat:4 }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Condiciones de pago</p>
+
+                <strong>
+                    {{ cotizacion.condiciones_pago|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Plazo de entrega</p>
+
+                <strong>
+                    {{ cotizacion.plazo_entrega|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Validez de la oferta</p>
+
+                <strong>
+                    {{ cotizacion.validez_oferta|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Creada por</p>
+
+                <strong>
+                    {{ cotizacion.creado_por|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Alcance</p>
+
+                <strong>
+                    {{ cotizacion.alcance|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Exclusiones</p>
+
+                <strong>
+                    {{ cotizacion.exclusiones|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Observaciones</p>
+
+                <strong>
+                    {{ cotizacion.observaciones|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="acciones">
+
+            <div>
+                <h2>Ítems de la cotización</h2>
+
+                <p class="texto-secundario">
+                    Productos, servicios y trabajos incluidos.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'cotizaciones:item_crear' cotizacion.pk %}"
+                class="boton"
+            >
+                Agregar ítem
+            </a>
+
+        </div>
+
+        {% if cotizacion.items.all %}
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Orden</th>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Unidad</th>
+                            <th>Precio unitario</th>
+                            <th>Descuento</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in cotizacion.items.all %}
+                            <tr>
+                                <td>{{ item.orden }}</td>
+
+                                <td>
+                                    {{ item.codigo|default:"—" }}
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        {{ item.descripcion }}
+                                    </strong>
+
+                                    {% if item.detalle %}
+                                        <p class="texto-secundario">
+                                            {{ item.detalle }}
+                                        </p>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ item.cantidad|floatformat:2 }}
+                                </td>
+
+                                <td>
+                                    {{ item.unidad }}
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.moneda }}
+                                    {{ item.precio_unitario|floatformat:2 }}
+                                </td>
+
+                                <td>
+                                    {{ item.descuento_porcentaje|floatformat:2 }}%
+                                </td>
+
+                                <td>
+                                    {{ cotizacion.moneda }}
+                                    {{ item.subtotal|floatformat:2 }}
+                                </td>
+
+                                <td>
+                                    <div class="grupo-botones">
+
+                                        <a
+                                            href="{% url 'cotizaciones:item_editar' item.pk %}"
+                                            class="boton boton-secundario boton-pequeno"
+                                        >
+                                            Editar
+                                        </a>
+
+                                        <a
+                                            href="{% url 'cotizaciones:item_eliminar' item.pk %}"
+                                            class="boton boton-peligro boton-pequeno"
+                                        >
+                                            Eliminar
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="sin-registros">
+                Esta cotización todavía no tiene ítems.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="panel resumen-cotizacion">
+
+        <h2>Resumen económico</h2>
+
+        <div class="resumen-totales">
+
+            <div class="resumen-fila">
+                <span>Subtotal</span>
+
+                <strong>
+                    {{ cotizacion.moneda }}
+                    {{ cotizacion.subtotal|floatformat:2 }}
+                </strong>
+            </div>
+
+            <div class="resumen-fila">
+                <span>
+                    Descuento general
+                    ({{ cotizacion.descuento_porcentaje|floatformat:2 }}%)
+                </span>
+
+                <strong>
+                    - {{ cotizacion.moneda }}
+                    {{ cotizacion.descuento|floatformat:2 }}
+                </strong>
+            </div>
+
+            <div class="resumen-fila">
+                <span>Neto</span>
+
+                <strong>
+                    {{ cotizacion.moneda }}
+                    {{ cotizacion.neto|floatformat:2 }}
+                </strong>
+            </div>
+
+            <div class="resumen-fila">
+                <span>
+                    Impuesto
+                    ({{ cotizacion.impuesto_porcentaje|floatformat:2 }}%)
+                </span>
+
+                <strong>
+                    {{ cotizacion.moneda }}
+                    {{ cotizacion.impuesto|floatformat:2 }}
+                </strong>
+            </div>
+
+            <div class="resumen-fila resumen-total">
+                <span>Total</span>
+
+                <strong>
+                    {{ cotizacion.moneda }}
+                    {{ cotizacion.total|floatformat:2 }}
+                </strong>
+            </div>
+
+            {% if cotizacion.moneda != "CLP" %}
+                <div class="resumen-fila resumen-total-clp">
+                    <span>Total equivalente en CLP</span>
+
+                    <strong>
+                        ${{ cotizacion.total_clp|floatformat:0 }}
+                    </strong>
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endblock %}

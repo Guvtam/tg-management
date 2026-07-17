@@ -1,0 +1,189 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ empresa }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="acciones">
+
+        <div class="encabezado-pagina">
+            <h1>{{ empresa }}</h1>
+
+            <p>
+                Información comercial y relaciones asociadas.
+            </p>
+        </div>
+
+        <div class="grupo-botones">
+            <a
+                href="{% url 'crm:empresa_editar' empresa.pk %}"
+                class="boton"
+            >
+                Editar empresa
+            </a>
+
+            <a
+                href="{% url 'crm:empresa_lista' %}"
+                class="boton boton-secundario"
+            >
+                Volver
+            </a>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="detalle-grid">
+
+            <div class="detalle-item">
+                <p>Razón social</p>
+                <strong>{{ empresa.razon_social }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Nombre de fantasía</p>
+                <strong>
+                    {{ empresa.nombre_fantasia|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>RUT</p>
+                <strong>{{ empresa.rut|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Tipo</p>
+                <strong>{{ empresa.get_tipo_display }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Rubro</p>
+                <strong>{{ empresa.rubro|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Estado</p>
+                <strong>{{ empresa.get_estado_display }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Correo electrónico</p>
+                <strong>{{ empresa.email|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Teléfono</p>
+                <strong>{{ empresa.telefono|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Dirección</p>
+                <strong>{{ empresa.direccion|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Comuna</p>
+                <strong>{{ empresa.comuna|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Región</p>
+                <strong>{{ empresa.region|default:"—" }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <p>Sitio web</p>
+
+                {% if empresa.sitio_web %}
+                    <strong>
+                        <a
+                            href="{{ empresa.sitio_web }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {{ empresa.sitio_web }}
+                        </a>
+                    </strong>
+                {% else %}
+                    <strong>—</strong>
+                {% endif %}
+            </div>
+
+            <div class="detalle-item campo-completo">
+                <p>Observaciones</p>
+
+                <strong>
+                    {{ empresa.observaciones|default:"—"|linebreaksbr }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="tarjetas tarjetas-separadas">
+
+        <div class="tarjeta">
+            <p>Contactos asociados</p>
+            <strong>{{ empresa.contactos.count }}</strong>
+        </div>
+
+        <div class="tarjeta">
+            <p>Oportunidades asociadas</p>
+            <strong>{{ empresa.oportunidades.count }}</strong>
+        </div>
+
+    </div>
+
+    <div class="panel">
+        <h2>Gestión de contactos</h2>
+
+        <div class="grupo-botones">
+            <a
+                href="{% url 'crm:contacto_crear' %}?empresa={{ empresa.pk }}"
+                class="boton"
+            >
+                Agregar contacto
+            </a>
+
+            <a
+                href="{% url 'crm:contacto_lista' %}?q={{ empresa.razon_social|urlencode }}"
+                class="boton boton-secundario"
+            >
+                Ver contactos
+            </a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Gestión comercial</h2>
+
+        <div class="grupo-botones">
+            <a
+                href="{% url 'crm:contacto_crear' %}?empresa={{ empresa.pk }}"
+                class="boton"
+            >
+                Agregar contacto
+            </a>
+
+            <a
+                href="{% url 'crm:oportunidad_crear' %}?empresa={{ empresa.pk }}"
+                class="boton"
+            >
+                Crear oportunidad
+            </a>
+
+            <a
+                href="{% url 'crm:oportunidad_lista' %}?q={{ empresa.razon_social|urlencode }}"
+                class="boton boton-secundario"
+            >
+                Ver oportunidades
+            </a>
+        </div>
+    </div>
+
+{% endblock %}

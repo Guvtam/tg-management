@@ -49,4 +49,14 @@ urlpatterns = [
         views.item_eliminar,
         name="item_eliminar",
     ),
+    path(
+        "<int:pk>/pdf/",
+        views.cotizacion_exportar_pdf,
+        name="cotizacion_exportar_pdf",
+    ),
+    path(
+        "<int:pk>/pdf/ver/",
+        views.cotizacion_ver_pdf,
+        name="cotizacion_ver_pdf",
+    ),
 ]

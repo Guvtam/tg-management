@@ -1,0 +1,144 @@
+.modal-exportar {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: rgba(15, 23, 42, 0.58);
+}
+
+.modal-exportar.activo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-exportar-contenido {
+    width: 100%;
+    max-width: 560px;
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+    animation: modalExportarEntrada 0.18s ease-out;
+}
+
+.modal-exportar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.modal-exportar-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 24px;
+}
+
+.modal-exportar-cerrar {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.modal-exportar-cerrar:hover {
+    color: #0f172a;
+}
+
+.modal-exportar-texto {
+    margin: 0 0 20px;
+    color: #64748b;
+}
+
+.modal-exportar-opciones {
+    display: grid;
+    gap: 12px;
+}
+
+.opcion-exportar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid #dbe4ee;
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: #0f172a;
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.opcion-exportar:hover {
+    border-color: #14b8a6;
+    background-color: #f0fdfa;
+    transform: translateY(-1px);
+}
+
+.opcion-exportar-icono {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 42px;
+    border-radius: 10px;
+    background-color: #0f172a;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.opcion-exportar strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 15px;
+}
+
+.opcion-exportar small {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.modal-exportar-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+@keyframes modalExportarEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 600px) {
+    .modal-exportar-contenido {
+        padding: 18px;
+    }
+
+    .opcion-exportar {
+        align-items: flex-start;
+    }
+}

@@ -1,0 +1,418 @@
+{% load humanize %}
+{% load cotizaciones_extras %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cotización {{ cotizacion.numero }}</title>
+<style>
+
+    @page {
+        size: A4;
+        margin: 1.7cm 1.8cm 1.5cm 1.8cm;
+    }
+
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 10.5px;
+        color: #1E293B;
+        line-height: 1.5;
+    }
+
+    h1, h2, h3 { margin: 0; padding: 0; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* ---------- Encabezado ---------- */
+
+    .header-table td {
+        border: none;
+        padding: 0;
+        vertical-align: top;
+    }
+
+    .logo-img {
+        width: 46px;
+        height: 46px;
+    }
+
+    .marca-nombre {
+        font-size: 15px;
+        font-weight: bold;
+        color: #0F172A;
+    }
+
+    .marca-nombre span {
+        color: #14B8A6;
+    }
+
+    .marca-subtitulo {
+        font-size: 7.5px;
+        letter-spacing: 1.5px;
+        color: #64748B;
+        text-transform: uppercase;
+    }
+
+    .cot-label {
+        font-size: 9px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #14B8A6;
+        font-weight: bold;
+        text-align: right;
+    }
+
+    .cot-numero {
+        font-size: 20px;
+        font-weight: bold;
+        color: #0F172A;
+        text-align: right;
+    }
+
+    .cot-fecha {
+        font-size: 9px;
+        color: #64748B;
+        text-align: right;
+    }
+
+    .barra {
+        background-color: #14B8A6;
+        height: 3px;
+        font-size: 1px;
+        line-height: 1px;
+    }
+
+    .espacio-barra { height: 14px; font-size: 1px; line-height: 1px; }
+
+    /* ---------- Secciones ---------- */
+
+    .titulo-seccion {
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #0F172A;
+        border-bottom: 1.5px solid #14B8A6;
+        padding-bottom: 4px;
+        margin-top: 12px;
+        margin-bottom: 6px;
+    }
+
+    .datos-cliente-table td {
+        border: none;
+        padding: 3px 4px;
+        vertical-align: top;
+        font-size: 10px;
+    }
+
+    .datos-cliente-table .etiqueta {
+        color: #64748B;
+        width: 34%;
+    }
+
+    .datos-cliente-table .valor {
+        color: #0F172A;
+        font-weight: bold;
+    }
+
+    /* ---------- Tabla de ítems ---------- */
+
+    .items-table {
+        margin-top: 4px;
+    }
+
+    .items-table th {
+        background-color: #0F172A;
+        color: #FFFFFF;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 7px 6px;
+        border: 1px solid #0F172A;
+        text-align: left;
+    }
+
+    .items-table td {
+        padding: 5px 6px;
+        border: 1px solid #E2E8F0;
+        font-size: 9.5px;
+        vertical-align: top;
+    }
+
+    .items-table tr.par td {
+        background-color: #F0FDFA;
+    }
+
+    .items-table .detalle-item {
+        color: #64748B;
+        font-size: 8.5px;
+        font-style: italic;
+    }
+
+    .num { text-align: right; }
+    .centro { text-align: center; }
+
+    /* ---------- Totales ---------- */
+
+    .totales-wrap {
+        margin-top: 6px;
+    }
+
+    .totales-table {
+        width: 55%;
+    }
+
+    .totales-table td {
+        padding: 5px 8px;
+        border: none;
+        font-size: 10px;
+    }
+
+    .totales-table .t-label {
+        color: #475569;
+        text-align: right;
+    }
+
+    .totales-table .t-valor {
+        color: #0F172A;
+        text-align: right;
+        width: 40%;
+    }
+
+    .totales-table tr.total-final td {
+        background-color: #0F172A;
+        color: #FFFFFF;
+        font-weight: bold;
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .totales-table tr.total-final .t-label { color: #FFFFFF; }
+
+    .equivalente-clp {
+        text-align: right;
+        color: #94A3B8;
+        font-size: 8.5px;
+        font-style: italic;
+        padding-top: 2px;
+    }
+
+    /* ---------- Texto largo ---------- */
+
+    .bloque-texto {
+        border-left: 3px solid #14B8A6;
+        padding: 2px 0 2px 10px;
+        margin-bottom: 6px;
+        font-size: 9.5px;
+        color: #334155;
+    }
+
+    .bloque-texto p { margin: 0 0 2px 0; }
+
+    /* ---------- Footer ---------- */
+
+    .footer-linea {
+        border-top: 1px solid #E2E8F0;
+        margin-top: 12px;
+        padding-top: 6px;
+    }
+
+    .footer-table td {
+        border: none;
+        padding: 0;
+        font-size: 8.5px;
+        color: #64748B;
+        vertical-align: middle;
+    }
+
+    .footer-marca {
+        font-weight: bold;
+        color: #0F172A;
+        font-size: 9.5px;
+    }
+
+    .footer-marca span { color: #14B8A6; }
+
+    .footer-der {
+        text-align: right;
+    }
+
+</style>
+</head>
+<body>
+
+    <!-- Encabezado -->
+    <table class="header-table">
+        <tr>
+            <td style="width:60%;">
+                <table style="border:none;">
+                    <tr style="border:none;">
+                        <td style="border:none; width:52px; padding:0;">
+                            <img class="logo-img" src="data:image/png;base64,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" />
+                        </td>
+                        <td style="border:none; padding-left:8px; vertical-align:middle;">
+                            <div class="marca-nombre">TG-<span>TECHNOLOGY</span></div>
+                            <div class="marca-subtitulo">Soluciones digitales</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width:40%;">
+                <div class="cot-label">Cotización</div>
+                <div class="cot-numero">{{ cotizacion.numero }}</div>
+                <div class="cot-fecha">Emitida el {{ cotizacion.fecha_emision|date:"d/m/Y" }}</div>
+                {% if cotizacion.fecha_vencimiento %}
+                <div class="cot-fecha">Válida hasta el {{ cotizacion.fecha_vencimiento|date:"d/m/Y" }}</div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <table style="margin-top:10px;"><tr><td class="barra">&nbsp;</td></tr></table>
+
+    <!-- Datos del cliente -->
+    <div class="titulo-seccion">Datos del cliente</div>
+    <table class="datos-cliente-table">
+        <tr>
+            <td class="etiqueta">Empresa</td>
+            <td class="valor">
+                {% if cotizacion.oportunidad.empresa.nombre_fantasia %}
+                    {{ cotizacion.oportunidad.empresa.nombre_fantasia }}
+                {% else %}
+                    {{ cotizacion.oportunidad.empresa.razon_social }}
+                {% endif %}
+            </td>
+            <td class="etiqueta">Condiciones de pago</td>
+            <td class="valor">{{ cotizacion.condiciones_pago|default:"—" }}</td>
+        </tr>
+        <tr>
+            <td class="etiqueta">Contacto</td>
+            <td class="valor">{{ cotizacion.contacto|default:"—" }}</td>
+            <td class="etiqueta">Plazo de entrega</td>
+            <td class="valor">{{ cotizacion.plazo_entrega|default:"—" }}</td>
+        </tr>
+        <tr>
+            <td class="etiqueta">Rubro</td>
+            <td class="valor">{{ cotizacion.oportunidad.empresa.rubro|default:"—" }}</td>
+            <td class="etiqueta">Validez de la oferta</td>
+            <td class="valor">{{ cotizacion.validez_oferta|default:"—" }}</td>
+        </tr>
+    </table>
+
+    <!-- Ítems -->
+    <div class="titulo-seccion">Detalle de la cotización</div>
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width:10%;">Código</th>
+                <th style="width:38%;">Descripción</th>
+                <th style="width:9%;" class="centro">Cant.</th>
+                <th style="width:11%;">Unidad</th>
+                <th style="width:15%;" class="num">Precio unit.</th>
+                <th style="width:17%;" class="num">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cotizacion.items.all %}
+            <tr class="{% cycle 'impar' 'par' %}">
+                <td>{{ item.codigo|default:"—" }}</td>
+                <td>
+                    {{ item.descripcion }}
+                    {% if item.detalle %}
+                        <div class="detalle-item">{{ item.detalle }}</div>
+                    {% endif %}
+                </td>
+                <td class="centro">{{ item.cantidad|floatformat:"-2" }}</td>
+                <td>{{ item.unidad }}</td>
+                <td class="num">
+                    {{ item.precio_unitario|formato_moneda:cotizacion.moneda }}
+                    {% if item.descuento_porcentaje %}
+                        <div class="detalle-item">-{{ item.descuento_porcentaje|floatformat:"-2" }}%</div>
+                    {% endif %}
+                </td>
+                <td class="num">{{ item.subtotal|formato_moneda:cotizacion.moneda }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="centro">Sin ítems agregados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totales -->
+    <div class="totales-wrap">
+        <table class="totales-table" align="right">
+            <tr>
+                <td class="t-label">Subtotal</td>
+                <td class="t-valor">{{ cotizacion.subtotal|formato_moneda:cotizacion.moneda }}</td>
+            </tr>
+            {% if cotizacion.descuento_porcentaje %}
+            <tr>
+                <td class="t-label">Descuento ({{ cotizacion.descuento_porcentaje|floatformat:"-2" }}%)</td>
+                <td class="t-valor">-{{ cotizacion.descuento|formato_moneda:cotizacion.moneda }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td class="t-label">Neto</td>
+                <td class="t-valor">{{ cotizacion.neto|formato_moneda:cotizacion.moneda }}</td>
+            </tr>
+            <tr>
+                <td class="t-label">IVA ({{ cotizacion.impuesto_porcentaje|floatformat:"-2" }}%)</td>
+                <td class="t-valor">{{ cotizacion.impuesto|formato_moneda:cotizacion.moneda }}</td>
+            </tr>
+            <tr class="total-final">
+                <td class="t-label">Total</td>
+                <td class="t-valor">{{ cotizacion.total|formato_moneda:cotizacion.moneda }}</td>
+            </tr>
+        </table>
+        {% if cotizacion.moneda != "CLP" %}
+        <table class="totales-table" align="right">
+            <tr>
+                <td colspan="2" class="equivalente-clp">
+                    Equivalente aprox.: {{ cotizacion.total_clp|formato_moneda:"CLP" }}
+                    (1 {{ cotizacion.moneda }} = {{ cotizacion.valor_moneda|formato_moneda:"CLP" }})
+                </td>
+            </tr>
+        </table>
+        {% endif %}
+    </div>
+
+    <!-- Textos largos -->
+    {% if cotizacion.alcance %}
+    <div class="titulo-seccion">Alcance</div>
+    <div class="bloque-texto">{{ cotizacion.alcance|linebreaks }}</div>
+    {% endif %}
+
+    {% if cotizacion.exclusiones %}
+    <div class="titulo-seccion">Exclusiones</div>
+    <div class="bloque-texto">{{ cotizacion.exclusiones|linebreaks }}</div>
+    {% endif %}
+
+    {% if cotizacion.observaciones %}
+    <div class="titulo-seccion">Observaciones</div>
+    <div class="bloque-texto">{{ cotizacion.observaciones|linebreaks }}</div>
+    {% endif %}
+
+    <!-- Footer -->
+    <div class="footer-linea">
+        <table class="footer-table">
+            <tr>
+                <td style="width:60%;">
+                    <div class="footer-marca">TG-<span>TECHNOLOGY</span></div>
+                    <div>Creamos tecnología para hacer crecer tu empresa.</div>
+                    <div>contacto@tg-technology.cl &nbsp;·&nbsp; +56 9 5309 7689</div>
+                </td>
+                <td class="footer-der" style="width:40%;">
+                    Chile · Atención remota<br/>
+                    Cotización generada el {% now "d/m/Y" %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>

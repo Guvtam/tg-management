@@ -249,18 +249,18 @@ class ItemCotizacionForm(forms.ModelForm):
                     "min": "1",
                 }
             ),
-            "codigo": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Ej.: SERV-001",
-                }
-            ),
+            
             "descripcion": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": (
                         "Ej.: Desarrollo de sitio web corporativo"
                     ),
+                }
+            ),
+            "codigo": forms.TextInput(
+                attrs={
+                    "readonly": "readonly",
                 }
             ),
             "detalle": forms.Textarea(

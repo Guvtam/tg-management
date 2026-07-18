@@ -1,7 +1,15 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% block title %}
     {{ cotizacion.numero }} | TG Management
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{% static 'core/css/cotizacion_exportar.css' %}"
+>
 {% endblock %}
 
 {% block content %}
@@ -31,6 +39,14 @@
                 class="boton"
             >
                 Editar cotización
+            </a>
+
+            <a
+                id="btnAbrirModalExportar"
+                class="boton"
+                
+            >
+                Exportar PDF
             </a>
 
             <a
@@ -381,4 +397,90 @@
 
     </div>
 
+    <div id="modalExportar" class="modal-exportar">
+        <div class="modal-exportar-contenido">
+
+            <div class="modal-exportar-header">
+                <h2>Exportar cotización</h2>
+
+                <button
+                    type="button"
+                    class="modal-exportar-cerrar"
+                    onclick="cerrarModalExportar()"
+                    aria-label="Cerrar"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <p class="modal-exportar-texto">
+                Selecciona qué deseas hacer con la cotización
+                {{ cotizacion.numero }}.
+            </p>
+
+            <div class="modal-exportar-opciones">
+
+                <a
+                    href="{% url 'cotizaciones:cotizacion_exportar_pdf' cotizacion.pk %}"
+                    class="opcion-exportar"
+                >
+                    <span class="opcion-exportar-icono">PDF</span>
+
+                    <span>
+                        <strong>Descargar PDF</strong>
+                        <small>
+                            Descarga la cotización en tu computador.
+                        </small>
+                    </span>
+                </a>
+
+                <a
+                    href="{% url 'cotizaciones:cotizacion_ver_pdf' cotizacion.pk %}"
+                    class="opcion-exportar"
+                    target="_blank"
+                >
+                    <span class="opcion-exportar-icono">VER</span>
+
+                    <span>
+                        <strong>Ver PDF</strong>
+                        <small>
+                            Abre la cotización en una nueva pestaña.
+                        </small>
+                    </span>
+                </a>
+
+                <button
+                    type="button"
+                    class="opcion-exportar opcion-exportar-boton"
+                    onclick="alert('La opción de envío por correo será el siguiente desarrollo.')"
+                >
+                    <span class="opcion-exportar-icono">MAIL</span>
+
+                    <span>
+                        <strong>Enviar por correo</strong>
+                        <small>
+                            Adjuntar el PDF y enviarlo al contacto.
+                        </small>
+                    </span>
+                </button>
+
+            </div>
+
+            <div class="modal-exportar-footer">
+                <button
+                    type="button"
+                    class="boton"
+                    onclick="cerrarModalExportar()"
+                >
+                    Cancelar
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'core/js/cotizacion_exportar.js' %}"></script>
 {% endblock %}

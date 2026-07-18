@@ -1,7 +1,10 @@
 from django.contrib import messages
 from django.db.models import Max, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import get_template
 from django.utils import timezone
+from xhtml2pdf import pisa
 
 from .forms import CotizacionForm, ItemCotizacionForm
 from .models import Cotizacion, ItemCotizacion
@@ -161,6 +164,63 @@ def cotizacion_detalle(request, pk):
         contexto,
     )
 
+def cotizacion_exportar_pdf(request, pk):
+    """
+    Genera y descarga una cotización en formato PDF.
+    """
+
+    cotizacion = get_object_or_404(
+        Cotizacion.objects.select_related(
+            "oportunidad",
+            "oportunidad__empresa",
+            "contacto",
+            "creado_por",
+        ).prefetch_related(
+            "items",
+        ),
+        pk=pk,
+    )
+
+    template = get_template(
+        "cotizaciones/cotizacion_pdf.html"
+    )
+
+    contexto = {
+        "cotizacion": cotizacion,
+    }
+
+    html = template.render(
+        contexto
+    )
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    nombre_archivo = (
+        f"{cotizacion.numero}.pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="{nombre_archivo}"'
+    )
+
+    resultado = pisa.CreatePDF(
+        html,
+        dest=response,
+        encoding="UTF-8",
+    )
+
+    if resultado.err:
+        return HttpResponse(
+            "Ocurrió un error al generar el PDF.",
+            status=500,
+        )
+
+    return response
+
+
+
 
 def cotizacion_editar(request, pk):
     """
@@ -310,7 +370,14 @@ def item_editar(request, pk):
         )
 
         if form.is_valid():
-            item = form.save()
+            codigo_original = item.codigo
+
+            item = form.save(
+                commit=False
+            )
+
+            item.codigo = codigo_original
+            item.save()
 
             messages.success(
                 request,
@@ -386,3 +453,55 @@ def item_eliminar(request, pk):
         "cotizaciones/item_confirmar_eliminar.html",
         contexto,
     )
+
+def cotizacion_ver_pdf(request, pk):
+    """
+    Genera la cotización en PDF y la muestra
+    directamente en el navegador.
+    """
+
+    cotizacion = get_object_or_404(
+        Cotizacion.objects.select_related(
+            "oportunidad",
+            "oportunidad__empresa",
+            "contacto",
+            "creado_por",
+        ).prefetch_related(
+            "items",
+        ),
+        pk=pk,
+    )
+
+    template = get_template(
+        "cotizaciones/cotizacion_pdf.html"
+    )
+
+    contexto = {
+        "cotizacion": cotizacion,
+    }
+
+    html = template.render(contexto)
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    nombre_archivo = f"{cotizacion.numero}.pdf"
+
+    response["Content-Disposition"] = (
+        f'inline; filename="{nombre_archivo}"'
+    )
+
+    resultado = pisa.CreatePDF(
+        html,
+        dest=response,
+        encoding="UTF-8",
+    )
+
+    if resultado.err:
+        return HttpResponse(
+            "Ocurrió un error al generar el PDF.",
+            status=500,
+        )
+
+    return response

@@ -314,3 +314,27 @@ class ItemCotizacion(models.Model):
     @property
     def subtotal(self):
         return self.subtotal_bruto - self.descuento
+    
+    def save(self, *args, **kwargs):
+        if not self.codigo and self.cotizacion_id:
+            ultimo_item = (
+                ItemCotizacion.objects
+                .filter(cotizacion_id=self.cotizacion_id)
+                .exclude(codigo="")
+                .order_by("-pk")
+                .first()
+            )
+
+            siguiente = 1
+
+            if ultimo_item and ultimo_item.codigo:
+                try:
+                    siguiente = int(
+                        ultimo_item.codigo.replace("ITEM-", "")
+                    ) + 1
+                except ValueError:
+                    siguiente = self.cotizacion.items.count() + 1
+
+            self.codigo = f"ITEM-{siguiente:03d}"
+
+        super().save(*args, **kwargs)

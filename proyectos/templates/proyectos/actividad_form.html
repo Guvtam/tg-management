@@ -1,0 +1,96 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ titulo }}</h1>
+
+        <p>
+            Proyecto {{ proyecto.codigo }} · {{ proyecto.nombre }}
+        </p>
+    </div>
+</div>
+
+<div class="form-card">
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="form-grid">
+            <div class="campo campo-completo">
+                <label for="{{ form.titulo.id_for_label }}">
+                    {{ form.titulo.label }}
+                </label>
+
+                {{ form.titulo }}
+                {{ form.titulo.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="{{ form.tipo.id_for_label }}">
+                    {{ form.tipo.label }}
+                </label>
+
+                {{ form.tipo }}
+                {{ form.tipo.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="{{ form.estado.id_for_label }}">
+                    {{ form.estado.label }}
+                </label>
+
+                {{ form.estado }}
+                {{ form.estado.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="{{ form.responsable.id_for_label }}">
+                    {{ form.responsable.label }}
+                </label>
+
+                {{ form.responsable }}
+                {{ form.responsable.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="{{ form.fecha.id_for_label }}">
+                    {{ form.fecha.label }}
+                </label>
+
+                {{ form.fecha }}
+                {{ form.fecha.errors }}
+            </div>
+
+            <div class="campo campo-completo">
+                <label for="{{ form.descripcion.id_for_label }}">
+                    {{ form.descripcion.label }}
+                </label>
+
+                {{ form.descripcion }}
+                {{ form.descripcion.errors }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {{ boton|default:"Guardar actividad" }}
+            </button>
+
+            <a
+                href="{% url 'proyectos:proyecto_detalle' proyecto.pk %}"
+                class="btn btn-secondary"
+            >
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

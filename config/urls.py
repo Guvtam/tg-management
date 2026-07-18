@@ -21,6 +21,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("core.urls")),
     path("crm/", include("crm.urls")),
-    path("cotizaciones/",include("cotizaciones.urls"),
-    ),
+    path("cotizaciones/",include("cotizaciones.urls")),
+    path("proyectos/",include("proyectos.urls")),
+
 ]

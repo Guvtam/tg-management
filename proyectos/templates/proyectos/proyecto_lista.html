@@ -1,0 +1,157 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Proyectos | TG Management
+{% endblock %}
+
+{% block content %}
+
+<div class="encabezado-pagina">
+    <h1>Proyectos</h1>
+    <p>
+        Gestión y seguimiento de los proyectos adjudicados.
+    </p>
+</div>
+
+<div class="acciones">
+
+    <form method="get" class="filtros">
+
+        <input
+            type="text"
+            name="q"
+            value="{{ busqueda }}"
+            placeholder="Buscar por código, proyecto o cliente"
+        >
+
+        <select name="estado">
+            <option value="">Todos los estados</option>
+
+            {% for valor, etiqueta in estados %}
+                <option
+                    value="{{ valor }}"
+                    {% if estado_seleccionado == valor %}
+                        selected
+                    {% endif %}
+                >
+                    {{ etiqueta }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="boton">
+            Filtrar
+        </button>
+
+        {% if busqueda or estado_seleccionado %}
+            <a
+                href="{% url 'proyectos:proyecto_lista' %}"
+                class="boton boton-secundario"
+            >
+                Limpiar
+            </a>
+        {% endif %}
+
+    </form>
+
+    <a
+        href="{% url 'proyectos:proyecto_crear' %}"
+        class="boton"
+    >
+        Nuevo proyecto
+    </a>
+
+</div>
+
+<div class="panel">
+
+    {% if proyectos %}
+
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Proyecto</th>
+                        <th>Cliente</th>
+                        <th>Responsable</th>
+                        <th>Estado</th>
+                        <th>Prioridad</th>
+                        <th>Avance</th>
+                        <th>Fin planificado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for proyecto in proyectos %}
+                        <tr>
+                            <td>
+                                <a
+                                    href="{% url 'proyectos:proyecto_detalle' proyecto.pk %}"
+                                    class="enlace-tabla"
+                                >
+                                    {{ proyecto.codigo }}
+                                </a>
+                            </td>
+
+                            <td>
+                                {{ proyecto.nombre }}
+                            </td>
+
+                            <td>
+                                {{ proyecto.empresa }}
+                            </td>
+
+                            <td>
+                                {{ proyecto.responsable|default:"Sin asignar" }}
+                            </td>
+
+                            <td>
+                                <span class="estado estado-{{ proyecto.estado }}">
+                                    {{ proyecto.get_estado_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ proyecto.get_prioridad_display }}
+                            </td>
+
+                            <td>
+                                <div class="avance-tabla">
+                                    <div class="barra-avance">
+                                        <div
+                                            class="barra-avance-valor"
+                                            style="width: {{ proyecto.porcentaje_avance }}%;"
+                                        ></div>
+                                    </div>
+
+                                    <span>
+                                        {{ proyecto.porcentaje_avance }}%
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td>
+                                {{ proyecto.fecha_fin_planificada|date:"d-m-Y"|default:"—" }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+
+        <div class="sin-registros">
+            {% if busqueda or estado_seleccionado %}
+                No se encontraron proyectos con los filtros seleccionados.
+            {% else %}
+                Todavía no existen proyectos registrados.
+            {% endif %}
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,313 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="page-header proyecto-header">
+    <div>
+        <div class="encabezado-codigo">
+            <span class="codigo-registro">
+                {{ proyecto.codigo }}
+            </span>
+
+            <span class="estado estado-{{ proyecto.estado }}">
+                {{ proyecto.get_estado_display }}
+            </span>
+        </div>
+
+        <h1>{{ proyecto.nombre }}</h1>
+
+        <p>{{ proyecto.empresa.nombre }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a
+            href="{% url 'proyectos:proyecto_lista' %}"
+            class="btn btn-secondary"
+        >
+            Volver
+        </a>
+
+        <a
+            href="{% url 'proyectos:proyecto_editar' proyecto.pk %}"
+            class="btn btn-primary"
+        >
+            Editar proyecto
+        </a>
+    </div>
+</div>
+
+
+<div class="detalle-grid">
+
+    <section class="card detalle-principal">
+        <div class="card-header">
+            <div>
+                <h2>Información del proyecto</h2>
+                <p>Datos generales y seguimiento.</p>
+            </div>
+        </div>
+
+        <div class="detalle-datos-grid">
+            <div class="detalle-item">
+                <span class="detalle-label">Cliente</span>
+                <strong>{{ proyecto.empresa.nombre }}</strong>
+            </div>
+
+            <div class="detalle-item">
+                <span class="detalle-label">Responsable</span>
+
+                {% if proyecto.responsable %}
+                    <strong>
+                        {{ proyecto.responsable.get_full_name|default:proyecto.responsable.username }}
+                    </strong>
+                {% else %}
+                    <span class="texto-muted">Sin responsable</span>
+                {% endif %}
+            </div>
+
+            <div class="detalle-item">
+                <span class="detalle-label">Fecha de alta</span>
+
+                <strong>
+                    {{ proyecto.fecha_alta|date:"d-m-Y"|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <span class="detalle-label">Fecha de entrega</span>
+
+                <strong>
+                    {{ proyecto.fecha_entrega|date:"d-m-Y"|default:"—" }}
+                </strong>
+            </div>
+
+            <div class="detalle-item">
+                <span class="detalle-label">Prioridad</span>
+
+                <span class="prioridad prioridad-{{ proyecto.prioridad }}">
+                    {{ proyecto.get_prioridad_display }}
+                </span>
+            </div>
+
+            <div class="detalle-item">
+                <span class="detalle-label">Última actualización</span>
+
+                <strong>
+                    {{ proyecto.actualizado_en|date:"d-m-Y H:i" }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="avance-detalle">
+            <div class="avance-titulo">
+                <span>Avance del proyecto</span>
+                <strong>{{ proyecto.porcentaje_avance }}%</strong>
+            </div>
+
+            <div class="progress">
+                <div
+                    class="progress-bar"
+                    style="width: {{ proyecto.porcentaje_avance }}%;"
+                ></div>
+            </div>
+        </div>
+
+        {% if proyecto.descripcion %}
+            <div class="detalle-bloque">
+                <span class="detalle-label">Descripción</span>
+                <p>{{ proyecto.descripcion|linebreaksbr }}</p>
+            </div>
+        {% endif %}
+
+        {% if proyecto.observaciones %}
+            <div class="detalle-bloque">
+                <span class="detalle-label">Observaciones</span>
+                <p>{{ proyecto.observaciones|linebreaksbr }}</p>
+            </div>
+        {% endif %}
+    </section>
+
+
+    <aside class="detalle-lateral">
+        <section class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Cotización relacionada</h2>
+                </div>
+            </div>
+
+            {% if proyecto.cotizacion %}
+                <div class="cotizacion-relacionada">
+                    <strong>
+                        {{ proyecto.cotizacion.numero }}
+                    </strong>
+
+                    <p>
+                        {{ proyecto.cotizacion.oportunidad.titulo }}
+                    </p>
+
+                    <span class="estado">
+                        {{ proyecto.cotizacion.get_estado_display }}
+                    </span>
+
+                    <a
+                        href="{% url 'cotizaciones:cotizacion_detalle' proyecto.cotizacion.pk %}"
+                        class="enlace-detalle"
+                    >
+                        Ver cotización
+                    </a>
+                </div>
+            {% else %}
+                <div class="empty-state compacto">
+                    <p>No existe una cotización relacionada.</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Resumen de actividades</h2>
+                </div>
+            </div>
+
+            <div class="resumen-actividades">
+                <div>
+                    <strong>{{ total_actividades }}</strong>
+                    <span>Total</span>
+                </div>
+
+                <div>
+                    <strong>{{ actividades_completadas }}</strong>
+                    <span>Completadas</span>
+                </div>
+
+                <div>
+                    <strong>{{ avance_actividades }}%</strong>
+                    <span>Avance</span>
+                </div>
+            </div>
+        </section>
+    </aside>
+
+</div>
+
+
+<section class="card actividades-card">
+    <div class="card-header actividades-header">
+        <div>
+            <h2>Actividades del proyecto</h2>
+            <p>
+                Reuniones, desarrollo, revisiones y entregas.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'proyectos:actividad_crear' proyecto.pk %}"
+            class="btn btn-primary"
+        >
+            + Nueva actividad
+        </a>
+    </div>
+
+    {% if actividades %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Actividad</th>
+                        <th>Tipo</th>
+                        <th>Responsable</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th class="col-acciones">Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for actividad in actividades %}
+                        <tr>
+                            <td>
+                                <strong>{{ actividad.titulo }}</strong>
+
+                                {% if actividad.descripcion %}
+                                    <span class="tabla-subtexto">
+                                        {{ actividad.descripcion|truncatechars:80 }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ actividad.get_tipo_display }}
+                            </td>
+
+                            <td>
+                                {% if actividad.responsable %}
+                                    {{ actividad.responsable.get_full_name|default:actividad.responsable.username }}
+                                {% else %}
+                                    <span class="texto-muted">
+                                        Sin asignar
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ actividad.fecha|date:"d-m-Y"|default:"—" }}
+                            </td>
+
+                            <td>
+                                <span class="estado estado-{{ actividad.estado }}">
+                                    {{ actividad.get_estado_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="acciones-tabla">
+                                    <a
+                                        href="{% url 'proyectos:actividad_editar' actividad.pk %}"
+                                        class="btn-icon"
+                                        title="Editar actividad"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'proyectos:actividad_eliminar' actividad.pk %}"
+                                        onsubmit="return confirm('¿Eliminar esta actividad?');"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="btn-link-danger"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>Este proyecto todavía no tiene actividades</h3>
+
+            <p>
+                Agrega la primera actividad para comenzar el seguimiento.
+            </p>
+
+            <a
+                href="{% url 'proyectos:actividad_crear' proyecto.pk %}"
+                class="btn btn-primary"
+            >
+                Agregar actividad
+            </a>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

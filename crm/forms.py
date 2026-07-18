@@ -322,6 +322,7 @@ class ActividadForm(forms.ModelForm):
             "responsable",
             "resultado",
         ]
+        
 
         widgets = {
             "oportunidad": forms.Select(

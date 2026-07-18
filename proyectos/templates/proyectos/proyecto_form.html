@@ -1,0 +1,156 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ titulo }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+<div class="encabezado-pagina">
+    <h1>{{ titulo }}</h1>
+
+    <p>
+        Registra la información general, responsables y fechas del proyecto.
+    </p>
+</div>
+
+<div class="panel formulario">
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="mensaje-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="form-grid">
+    <div class="campo">
+        <label for="{{ form.nombre.id_for_label }}">
+            {{ form.nombre.label }}
+        </label>
+        {{ form.nombre }}
+        {{ form.nombre.errors }}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.empresa.id_for_label }}">
+            {{ form.empresa.label }}
+        </label>
+        {{ form.empresa }}
+        {{ form.empresa.errors }}
+    </div>
+
+    <div
+        class="campo campo-completo"
+        id="campo-cotizacion-relacionada"
+        data-url="{% url 'proyectos:cotizaciones_por_empresa' %}"
+    >
+        <label for="{{ form.cotizacion.id_for_label }}">
+            {{ form.cotizacion.label }}
+        </label>
+
+        {{ form.cotizacion }}
+        {{ form.cotizacion.errors }}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.responsable.id_for_label }}">
+            {{ form.responsable.label }}
+        </label>
+        {{ form.responsable }}
+        {{ form.responsable.errors }}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.fecha_alta.id_for_label }}">
+            {{ form.fecha_alta.label }}
+        </label>
+        {{ form.fecha_alta }}
+        {{ form.fecha_alta.errors }}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.fecha_entrega.id_for_label }}">
+            {{ form.fecha_entrega.label }}
+        </label>
+        {{ form.fecha_entrega }}
+        {{ form.fecha_entrega.errors }}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.estado.id_for_label }}">
+            {{ form.estado.label }}
+        </label>
+        {{ form.estado }}
+        {{ form.estado.errors }}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.prioridad.id_for_label }}">
+            {{ form.prioridad.label }}
+        </label>
+        {{ form.prioridad }}
+        {{ form.prioridad.errors }}
+    </div>
+
+    <div class="campo">
+        <label for="{{ form.porcentaje_avance.id_for_label }}">
+            {{ form.porcentaje_avance.label }}
+        </label>
+        {{ form.porcentaje_avance }}
+        {{ form.porcentaje_avance.errors }}
+    </div>
+
+    <div class="campo campo-completo">
+        <label for="{{ form.descripcion.id_for_label }}">
+            {{ form.descripcion.label }}
+        </label>
+        {{ form.descripcion }}
+        {{ form.descripcion.errors }}
+    </div>
+
+    <div class="campo campo-completo">
+        <label for="{{ form.observaciones.id_for_label }}">
+            {{ form.observaciones.label }}
+        </label>
+        {{ form.observaciones }}
+        {{ form.observaciones.errors }}
+    </div>
+</div>
+
+        <div class="acciones-formulario">
+
+            <button type="submit" class="boton">
+                {{ boton|default:"Guardar proyecto" }}
+            </button>
+
+            {% if proyecto %}
+                <a
+                    href="{% url 'proyectos:proyecto_detalle' proyecto.pk %}"
+                    class="boton boton-secundario"
+                >
+                    Cancelar
+                </a>
+            {% else %}
+                <a
+                    href="{% url 'proyectos:proyecto_lista' %}"
+                    class="boton boton-secundario"
+                >
+                    Cancelar
+                </a>
+            {% endif %}
+
+        </div>
+
+    </form>
+
+</div>
+
+{% block extra_js %}
+    <script src="{% static 'core/js/proyecto_form.js' %}"></script>
+{% endblock %}
+
+{% endblock %}

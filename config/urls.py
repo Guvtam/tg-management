@@ -27,6 +27,10 @@ urlpatterns = [
     path("proyectos/",include("proyectos.urls")),
     path("finanzas/",include("finanzas.urls")),
     path("soporte/", include("soporte.urls")),
+    path("encuestas/", include("encuestas.urls")),
+
+    # Autenticación
+    path("accounts/", include("django.contrib.auth.urls")),
 
 ]
 

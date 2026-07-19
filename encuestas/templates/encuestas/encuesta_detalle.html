@@ -1,0 +1,69 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Encuesta {{ encuesta.proyecto.codigo }} | TG Management{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'encuestas/css/encuestas.css' %}">{% endblock %}
+{% block content %}
+<div class="proyecto-header">
+    <div>
+        <div class="encabezado-codigo"><span class="codigo-registro">{{ encuesta.proyecto.codigo }}</span><span class="estado estado-{{ encuesta.estado }}">{{ encuesta.get_estado_display }}</span></div>
+        <h1>Encuesta de satisfacción</h1>
+        <p>{{ encuesta.proyecto.nombre }} · {{ encuesta.empresa }}</p>
+    </div>
+    <div class="header-actions"><a class="btn btn-secondary" href="{% url 'encuestas:lista' %}">Volver</a></div>
+</div>
+
+<div class="detalle-grid">
+    <section class="detalle-principal">
+        <div class="card-header"><div><h2>Información</h2><p>Datos de control y acceso público.</p></div></div>
+        <div class="detalle-datos-grid">
+            <div class="detalle-item"><span class="detalle-label">Cliente</span><strong>{{ encuesta.empresa }}</strong></div>
+            <div class="detalle-item"><span class="detalle-label">Contacto</span><strong>{{ encuesta.contacto|default:"—" }}</strong></div>
+            <div class="detalle-item"><span class="detalle-label">Fecha de envío</span><strong>{{ encuesta.fecha_envio|date:"d-m-Y H:i"|default:"—" }}</strong></div>
+            <div class="detalle-item"><span class="detalle-label">Vencimiento</span><strong>{{ encuesta.fecha_vencimiento|date:"d-m-Y"|default:"Sin vencimiento" }}</strong></div>
+        </div>
+        {% if not encuesta.respondida %}
+        <div class="detalle-bloque">
+            <span class="detalle-label">Enlace para el cliente</span>
+            <div class="enlace-publico"><input id="url-encuesta" class="form-control" value="{{ url_publica }}" readonly><button type="button" class="boton" onclick="copiarEncuesta()">Copiar enlace</button></div>
+        </div>
+        {% endif %}
+    </section>
+
+    <aside class="detalle-lateral">
+        <div class="card">
+            <h2>Acciones</h2>
+            {% if not encuesta.respondida and encuesta.estado != 'anulada' %}
+            <form method="post" action="{% url 'encuestas:marcar_enviada' encuesta.pk %}">{% csrf_token %}<button class="boton boton-exito boton-ancho" type="submit">Marcar como enviada</button></form>
+            <form method="post" action="{% url 'encuestas:anular' encuesta.pk %}" onsubmit="return confirm('¿Anular esta encuesta?');">{% csrf_token %}<button class="boton boton-peligro boton-ancho" type="submit">Anular encuesta</button></form>
+            {% else %}<p class="texto-secundario">No hay acciones pendientes.</p>{% endif %}
+        </div>
+    </aside>
+</div>
+
+{% if encuesta.respondida %}
+<div class="panel">
+    <h2>Resultado de la evaluación</h2>
+    <div class="resultado-grid">
+        <div class="resultado-kpi"><span>Satisfacción</span><strong>{{ encuesta.satisfaccion_general }}/5</strong></div>
+        <div class="resultado-kpi"><span>Calidad</span><strong>{{ encuesta.calidad_solucion }}/5</strong></div>
+        <div class="resultado-kpi"><span>Comunicación</span><strong>{{ encuesta.comunicacion }}/5</strong></div>
+        <div class="resultado-kpi"><span>Plazos</span><strong>{{ encuesta.cumplimiento_plazos }}/5</strong></div>
+        <div class="resultado-kpi"><span>Recomendación</span><strong>{{ encuesta.recomendacion }}/10</strong><small>{{ encuesta.categoria_nps }}</small></div>
+    </div>
+    <div class="detalle-datos-grid resultados-texto">
+        <div class="detalle-item"><span class="detalle-label">Cumplimiento de expectativas</span><strong>{{ encuesta.get_cumplimiento_expectativas_display }}</strong></div>
+        <div class="detalle-item"><span class="detalle-label">Aspectos valorados</span><p>{{ encuesta.aspectos_valorados|default:"—"|linebreaksbr }}</p></div>
+        <div class="detalle-item"><span class="detalle-label">Aspectos por mejorar</span><p>{{ encuesta.aspectos_mejora|default:"—"|linebreaksbr }}</p></div>
+        <div class="detalle-item"><span class="detalle-label">Testimonio</span><p>{{ encuesta.testimonio|default:"—"|linebreaksbr }}</p><small>{% if encuesta.autoriza_testimonio %}Autorizado para publicación{% else %}No autorizado para publicación{% endif %}</small></div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>
+function copiarEncuesta() {
+    const campo = document.getElementById("url-encuesta");
+    navigator.clipboard.writeText(campo.value).then(() => alert("Enlace copiado."));
+}
+</script>
+{% endblock %}

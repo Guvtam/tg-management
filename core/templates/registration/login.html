@@ -1,0 +1,95 @@
+{% extends "core/base_login.html" %}
+
+
+{% block title %}
+    Iniciar sesión | TG Technology
+{% endblock %}
+
+{% block content %}
+
+<div class="encabezado-login">
+
+    <span class="etiqueta-login">
+        TG Management
+    </span>
+
+    <h2>Bienvenida</h2>
+
+    <p>
+        Ingresa tus credenciales para acceder al sistema.
+    </p>
+
+</div>
+
+{% if form.errors %}
+    <div class="mensaje-error mensaje-login">
+        El usuario o la contraseña no son correctos.
+    </div>
+{% endif %}
+
+<form method="post" class="formulario-login">
+    {% csrf_token %}
+
+    <div class="campo-login">
+
+        <label for="{{ form.username.id_for_label }}">
+            Usuario
+        </label>
+
+        <input
+            type="text"
+            name="username"
+            id="{{ form.username.id_for_label }}"
+            value="{{ form.username.value|default:'' }}"
+            autocomplete="username"
+            placeholder="Ingresa tu usuario"
+            required
+            autofocus
+        >
+
+        {% if form.username.errors %}
+            <div class="error-campo">
+                {{ form.username.errors }}
+            </div>
+        {% endif %}
+
+    </div>
+
+    <div class="campo-login">
+
+        <label for="{{ form.password.id_for_label }}">
+            Contraseña
+        </label>
+
+        <input
+            type="password"
+            name="password"
+            id="{{ form.password.id_for_label }}"
+            autocomplete="current-password"
+            placeholder="Ingresa tu contraseña"
+            required
+        >
+
+        {% if form.password.errors %}
+            <div class="error-campo">
+                {{ form.password.errors }}
+            </div>
+        {% endif %}
+
+    </div>
+
+    {% if next %}
+        <input
+            type="hidden"
+            name="next"
+            value="{{ next }}"
+        >
+    {% endif %}
+
+    <button type="submit" class="boton-login">
+        Iniciar sesión
+    </button>
+
+</form>
+
+{% endblock %}

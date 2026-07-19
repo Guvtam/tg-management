@@ -1,0 +1,37 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Encuesta de satisfacción | TG Technology</title>
+    <link rel="stylesheet" href="{% static 'encuestas/css/encuestas.css' %}">
+</head>
+<body class="encuesta-publica-body">
+<main class="encuesta-publica">
+    <header class="encuesta-publica-header">
+        <span class="encuesta-marca">TG Technology</span>
+        <h1>Queremos conocer tu experiencia</h1>
+        <p>Tu opinión nos ayuda a mejorar continuamente nuestros servicios.</p>
+        <div class="encuesta-proyecto"><strong>{{ encuesta.proyecto.nombre }}</strong><span>{{ encuesta.empresa }}</span></div>
+    </header>
+    <form method="post" class="encuesta-publica-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="mensaje-error">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+        <section class="pregunta">
+            <label class="pregunta-label">{{ forloop.counter }}. {{ field.label }}{% if field.field.required %} *{% endif %}</label>
+            {% if field.name == 'satisfaccion_general' or field.name == 'calidad_solucion' or field.name == 'comunicacion' or field.name == 'cumplimiento_plazos' or field.name == 'recomendacion' or field.name == 'cumplimiento_expectativas' %}
+                <div class="opciones-escala">{{ field }}</div>
+            {% elif field.name == 'autoriza_testimonio' %}
+                <div class="autorizacion">{{ field }} <label for="{{ field.id_for_label }}">Sí, autorizo el uso de mi testimonio en material comercial de TG Technology.</label></div>
+            {% else %}{{ field }}{% endif %}
+            {% for error in field.errors %}<div class="error-campo">{{ error }}</div>{% endfor %}
+        </section>
+        {% endfor %}
+        <button class="boton-publico" type="submit">Enviar evaluación</button>
+        <p class="privacidad">La información será utilizada únicamente para evaluar y mejorar el servicio.</p>
+    </form>
+</main>
+</body>
+</html>

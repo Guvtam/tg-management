@@ -143,6 +143,39 @@ class Proyecto(models.Model):
 
     def __str__(self):
         return f"{self.codigo} - {self.nombre}"
+    
+    def actualizar_porcentaje_avance(self):
+        """
+        Calcula el avance del proyecto según sus actividades.
+
+        Las actividades canceladas no participan en el cálculo.
+        """
+
+        actividades = self.actividades.exclude(
+            estado=ActividadProyecto.Estado.CANCELADA
+        )
+
+        total_actividades = actividades.count()
+
+        if total_actividades == 0:
+            nuevo_porcentaje = 0
+        else:
+            actividades_completadas = actividades.filter(
+                estado=ActividadProyecto.Estado.COMPLETADA
+            ).count()
+
+            nuevo_porcentaje = round(
+                actividades_completadas * 100 / total_actividades
+            )
+
+        type(self).objects.filter(pk=self.pk).update(
+            porcentaje_avance=nuevo_porcentaje
+        )
+
+        self.porcentaje_avance = nuevo_porcentaje
+
+        return nuevo_porcentaje
+
     def save(self, *args, **kwargs):
         generar_codigo = not self.codigo
 
@@ -239,6 +272,42 @@ class ActividadProyecto(models.Model):
 
     def __str__(self):
         return f"{self.proyecto.codigo} - {self.titulo}"
+    
+    def save(self, *args, **kwargs):
+        proyecto_anterior_id = None
+
+        if self.pk:
+            proyecto_anterior_id = (
+                type(self).objects
+                .filter(pk=self.pk)
+                .values_list("proyecto_id", flat=True)
+                .first()
+            )
+
+        super().save(*args, **kwargs)
+
+        self.proyecto.actualizar_porcentaje_avance()
+
+        if (
+            proyecto_anterior_id
+            and proyecto_anterior_id != self.proyecto_id
+        ):
+            proyecto_anterior = Proyecto.objects.filter(
+                pk=proyecto_anterior_id
+            ).first()
+
+            if proyecto_anterior:
+                proyecto_anterior.actualizar_porcentaje_avance()
+
+
+    def delete(self, *args, **kwargs):
+        proyecto = self.proyecto
+
+        resultado = super().delete(*args, **kwargs)
+
+        proyecto.actualizar_porcentaje_avance()
+
+        return resultado
     
 
 class DocumentoProyecto(models.Model):

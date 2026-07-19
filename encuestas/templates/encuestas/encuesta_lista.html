@@ -1,0 +1,56 @@
+{% extends "core/base.html" %}
+
+{% block title %}Satisfacción de clientes | TG Management{% endblock %}
+
+{% block content %}
+<div class="encabezado-pagina">
+    <h1>Satisfacción de clientes</h1>
+    <p>Gestiona encuestas y revisa la experiencia de tus clientes.</p>
+</div>
+
+<div class="tarjetas">
+    <div class="tarjeta"><p>Total encuestas</p><strong>{{ total_encuestas }}</strong></div>
+    <div class="tarjeta"><p>Respondidas</p><strong>{{ total_respondidas }}</strong></div>
+    <div class="tarjeta"><p>Tasa de respuesta</p><strong>{{ tasa_respuesta }}%</strong></div>
+    <div class="tarjeta"><p>NPS</p><strong>{{ nps }}</strong></div>
+</div>
+
+<div class="acciones">
+    <form method="get" class="filtros">
+        <input type="search" name="q" value="{{ buscar }}" placeholder="Proyecto o cliente">
+        <select name="estado">
+            <option value="">Todos los estados</option>
+            {% for valor, etiqueta in estados %}
+                <option value="{{ valor }}" {% if estado_actual == valor %}selected{% endif %}>{{ etiqueta }}</option>
+            {% endfor %}
+        </select>
+        <button class="boton boton-secundario" type="submit">Filtrar</button>
+    </form>
+    <a class="boton" href="{% url 'encuestas:crear' %}">Nueva encuesta</a>
+</div>
+
+<div class="panel">
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+                <tr><th>Proyecto</th><th>Cliente</th><th>Estado</th><th>Envío</th><th>Respuesta</th><th>Satisfacción</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for encuesta in encuestas %}
+                <tr>
+                    <td><strong>{{ encuesta.proyecto.codigo }}</strong><br><span class="texto-secundario">{{ encuesta.proyecto.nombre }}</span></td>
+                    <td>{{ encuesta.empresa }}</td>
+                    <td><span class="estado estado-{{ encuesta.estado }}">{{ encuesta.get_estado_display }}</span></td>
+                    <td>{{ encuesta.fecha_envio|date:"d-m-Y H:i"|default:"—" }}</td>
+                    <td>{{ encuesta.fecha_respuesta|date:"d-m-Y H:i"|default:"—" }}</td>
+                    <td>{% if encuesta.promedio_satisfaccion %}{{ encuesta.promedio_satisfaccion }}/5{% else %}—{% endif %}</td>
+                    <td><a class="enlace-tabla" href="{% url 'encuestas:detalle' encuesta.pk %}">Ver detalle</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="sin-registros">No hay encuestas registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

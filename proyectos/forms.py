@@ -20,7 +20,7 @@ class ProyectoForm(forms.ModelForm):
             "fecha_entrega",
             "estado",
             "prioridad",
-            "porcentaje_avance",
+            
             "descripcion",
         ]
 
@@ -70,13 +70,7 @@ class ProyectoForm(forms.ModelForm):
                     "class": "form-control",
                 }
             ),
-            "porcentaje_avance": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "min": 0,
-                    "max": 100,
-                }
-            ),
+           
             "descripcion": forms.Textarea(
                 attrs={
                     "class": "form-control",

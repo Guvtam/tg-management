@@ -1,0 +1,11 @@
+Verificaciones realizadas sobre el paquete:
+- Compilación sintáctica de todos los archivos Python.
+- Revisión de relaciones contra crm.Empresa, crm.Contacto y proyectos.Proyecto.
+- Migración alineada con crm/0002 y proyectos/0006 del repositorio actual.
+- URLs públicas e internas separadas.
+- Vistas internas protegidas con login_required.
+- Formularios públicos protegidos por CSRF y validadores del modelo.
+
+La prueba definitiva debe ejecutarse dentro del entorno virtual del proyecto:
+python manage.py check
+python manage.py test encuestas

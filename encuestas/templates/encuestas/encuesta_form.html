@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% block title %}Nueva encuesta | TG Management{% endblock %}
+{% block content %}
+<div class="encabezado-pagina">
+    <h1>Nueva encuesta de satisfacción</h1>
+    <p>Genera un enlace único para que el cliente evalúe el servicio.</p>
+</div>
+<div class="panel formulario">
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="mensaje-error">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="form-grid">
+            {% for field in form %}
+            <div class="campo {% if field.name == 'proyecto' and field.is_hidden %}campo-oculto{% endif %}">
+                {% if not field.is_hidden %}<label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>{% endif %}
+                {{ field }}
+                {% for error in field.errors %}<div class="error-campo">{{ error }}</div>{% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="acciones-formulario">
+            <button class="boton" type="submit">Crear encuesta</button>
+            <a class="boton boton-secundario" href="{% url 'encuestas:lista' %}">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

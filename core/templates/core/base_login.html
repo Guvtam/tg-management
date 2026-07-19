@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            TG Management
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'core/css/styles.css' %}"
+    >
+</head>
+
+<body class="pagina-login">
+
+    <main class="contenedor-login">
+
+        <section class="marca-login">
+
+            <div class="logo-login">
+                TG
+            </div>
+
+            <h1>TG Technology</h1>
+
+            <p>
+                Soluciones digitales para mejorar y hacer crecer tu negocio.
+            </p>
+
+        </section>
+
+        <section class="tarjeta-login">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+        <footer class="pie-login">
+            © {% now "Y" %} TG Technology
+        </footer>
+
+    </main>
+
+</body>
+</html>

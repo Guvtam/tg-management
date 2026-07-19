@@ -1,0 +1,499 @@
+{% extends "core/base.html" %}
+{% load static humanize %}
+
+{% block title %}
+    Modalidades de pago | TG Management
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'modalidades_pago/css/modalidades_pago.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+
+<div class="mp-detalle">
+
+    <!-- Encabezado -->
+    <div class="mp-detalle-encabezado">
+
+        <div>
+            <p class="mp-sobrelinea">
+                Condiciones comerciales
+            </p>
+
+            <h1>
+                Modalidades de pago
+            </h1>
+
+            <p class="mp-detalle-subtitulo">
+                Cotización
+                <strong>{{ cotizacion.numero }}</strong>
+                para
+                <strong>{{ cotizacion.oportunidad.empresa }}</strong>
+            </p>
+        </div>
+
+        <div class="mp-detalle-acciones">
+
+            <a
+                href="{% url 'modalidades_pago:configurar' cotizacion.pk %}"
+                class="boton"
+            >
+                Editar modalidades
+            </a>
+
+            <a
+                href="{% url 'cotizaciones:cotizacion_detalle' cotizacion.pk %}"
+                class="boton boton-secundario"
+            >
+                Ver cotización
+            </a>
+
+            <a
+                href="{% url 'modalidades_pago:lista' %}"
+                class="boton boton-secundario"
+            >
+                Volver
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Resumen principal -->
+    <section class="mp-detalle-resumen">
+
+        <div class="mp-detalle-resumen-icono">
+            $
+        </div>
+
+        <div>
+            <span>
+                Valor total de la cotización
+            </span>
+
+            <strong>
+                {{ cotizacion.moneda }}
+                {{ modalidad.valor_cotizacion|floatformat:0|intcomma }}
+            </strong>
+        </div>
+
+        <div class="mp-detalle-resumen-estado">
+            Configuración activa
+        </div>
+
+    </section>
+
+
+    <!-- Modalidades -->
+    <div class="mp-detalle-grid">
+
+        {% if modalidad.mostrar_pago_unico %}
+
+            <section class="mp-detalle-tarjeta mp-detalle-tarjeta-verde">
+
+                <header class="mp-detalle-tarjeta-cabecera">
+
+                    <div class="mp-detalle-numero mp-detalle-numero-verde">
+                        1
+                    </div>
+
+                    <div>
+                        <span class="mp-detalle-etiqueta">
+                            Opción de pago
+                        </span>
+
+                        <h2>
+                            Pago único
+                        </h2>
+
+                        <p>
+                            El cliente paga el desarrollo completo al
+                            confirmar el proyecto.
+                        </p>
+                    </div>
+
+                    <span class="mp-badge mp-badge-verde">
+                        Pago contado
+                    </span>
+
+                </header>
+
+
+                <div class="mp-detalle-contenido">
+
+                    <div class="mp-detalle-fila">
+
+                        <div>
+                            <span>
+                                Valor normal del proyecto
+                            </span>
+
+                            <small>
+                                Total original de la cotización
+                            </small>
+                        </div>
+
+                        <strong>
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.valor_cotizacion|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mp-detalle-fila">
+
+                        <div>
+                            <span>
+                                Descuento por pago único
+                            </span>
+
+                            <small>
+                                {{ modalidad.descuento_pago_unico|floatformat:2 }}%
+                                sobre el valor total
+                            </small>
+                        </div>
+
+                        <strong class="mp-valor-descuento">
+                            -
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.descuento_pago_unico_monto|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mp-detalle-total mp-detalle-total-verde">
+
+                        <div>
+                            <span>
+                                Total a pagar
+                            </span>
+
+                            <small>
+                                Pago único al confirmar el proyecto
+                            </small>
+                        </div>
+
+                        <strong>
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.total_pago_unico|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        {% endif %}
+
+
+        {% if modalidad.mostrar_plan_12_meses %}
+
+            <section class="mp-detalle-tarjeta mp-detalle-tarjeta-azul">
+
+                <header class="mp-detalle-tarjeta-cabecera">
+
+                    <div class="mp-detalle-numero mp-detalle-numero-azul">
+                        2
+                    </div>
+
+                    <div>
+                        <span class="mp-detalle-etiqueta">
+                            Opción de financiamiento
+                        </span>
+
+                        <h2>
+                            Pie {{ modalidad.porcentaje_pie|floatformat:0 }}%
+                            + 12 cuotas
+                        </h2>
+
+                        <p>
+                            El cliente paga un pie inicial y financia
+                            el saldo restante durante 12 meses.
+                        </p>
+                    </div>
+
+                    <span class="mp-badge mp-badge-azul">
+                        12 meses
+                    </span>
+
+                </header>
+
+
+                <div class="mp-detalle-contenido">
+
+                    <div class="mp-detalle-fila">
+
+                        <div>
+                            <span>
+                                Pie inicial
+                            </span>
+
+                            <small>
+                                {{ modalidad.porcentaje_pie|floatformat:2 }}%
+                                del valor del proyecto
+                            </small>
+                        </div>
+
+                        <strong>
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.monto_pie|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mp-detalle-fila">
+
+                        <div>
+                            <span>
+                                Saldo a financiar
+                            </span>
+
+                            <small>
+                                Valor pendiente después del pie
+                            </small>
+                        </div>
+
+                        <strong>
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.saldo_financiado|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mp-detalle-fila">
+
+                        <div>
+                            <span>
+                                Cuota mensual del desarrollo
+                            </span>
+
+                            <small>
+                                Saldo financiado dividido en 12 cuotas
+                            </small>
+                        </div>
+
+                        <strong>
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.cuota_desarrollo|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mp-detalle-fila">
+
+                        <div>
+                            <span>
+                                Mantención y soporte mensual
+                            </span>
+
+                            <small>
+                                Servicio mensual adicional
+                            </small>
+                        </div>
+
+                        <strong>
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.mantencion_mensual|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mp-detalle-total mp-detalle-total-azul">
+
+                        <div>
+                            <span>
+                                Cuota mensual única
+                            </span>
+
+                            <small>
+                                Desarrollo + mantención y soporte
+                            </small>
+                        </div>
+
+                        <strong>
+                            {{ cotizacion.moneda }}
+                            {{ modalidad.cuota_mensual_unica|floatformat:0|intcomma }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <footer class="mp-detalle-pie-tarjeta">
+
+                    <span class="mp-check">
+                        ✓
+                    </span>
+
+                    <span>
+                        Compromiso comercial de 12 cuotas mensuales
+                    </span>
+
+                </footer>
+
+            </section>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Vista resumida -->
+    <section class="mp-comparacion">
+
+        <div class="mp-comparacion-encabezado">
+
+            <div>
+                <p class="mp-sobrelinea">
+                    Resumen para presentar
+                </p>
+
+                <h2>
+                    Comparación de modalidades
+                </h2>
+
+                <p>
+                    Resumen simple de las opciones que podrá elegir el cliente.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="mp-comparacion-grid">
+
+            {% if modalidad.mostrar_pago_unico %}
+
+                <article class="mp-comparacion-opcion">
+
+                    <div>
+                        <span>
+                            Pago único
+                        </span>
+
+                        <small>
+                            Pago al confirmar el proyecto
+                        </small>
+                    </div>
+
+                    <strong>
+                        {{ cotizacion.moneda }}
+                        {{ modalidad.total_pago_unico|floatformat:0|intcomma }}
+                    </strong>
+
+                </article>
+
+            {% endif %}
+
+
+            {% if modalidad.mostrar_plan_12_meses %}
+
+                <article class="mp-comparacion-opcion">
+
+                    <div>
+                        <span>
+                            Pie inicial
+                        </span>
+
+                        <small>
+                            Al firmar o confirmar el proyecto
+                        </small>
+                    </div>
+
+                    <strong>
+                        {{ cotizacion.moneda }}
+                        {{ modalidad.monto_pie|floatformat:0|intcomma }}
+                    </strong>
+
+                </article>
+
+
+                <article class="mp-comparacion-opcion mp-comparacion-destacada">
+
+                    <div>
+                        <span>
+                            12 cuotas mensuales
+                        </span>
+
+                        <small>
+                            Desarrollo + mantención y soporte
+                        </small>
+                    </div>
+
+                    <strong>
+                        {{ cotizacion.moneda }}
+                        {{ modalidad.cuota_mensual_unica|floatformat:0|intcomma }}
+                    </strong>
+
+                </article>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <!-- Observaciones -->
+    {% if modalidad.observaciones %}
+
+        <section class="mp-observaciones-detalle">
+
+            <div class="mp-observaciones-icono">
+                i
+            </div>
+
+            <div>
+                <h2>
+                    Observaciones comerciales
+                </h2>
+
+                <p>
+                    {{ modalidad.observaciones|linebreaksbr }}
+                </p>
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    <!-- Zona peligrosa -->
+    <section class="mp-zona-peligro">
+
+        <div>
+            <strong>
+                Eliminar configuración
+            </strong>
+
+            <p>
+                Esto eliminará las modalidades asociadas a esta cotización.
+                La cotización original no será eliminada.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'modalidades_pago:eliminar' cotizacion.pk %}"
+            class="mp-boton-eliminar"
+        >
+            Eliminar modalidades
+        </a>
+
+    </section>
+
+</div>
+
+{% endblock %}

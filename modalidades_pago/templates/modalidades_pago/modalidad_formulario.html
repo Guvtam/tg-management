@@ -1,0 +1,223 @@
+{% extends "core/base.html" %}
+{% load static humanize l10n %}
+
+{% block title %}Configurar modalidades | TG Management{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'modalidades_pago/css/modalidades_pago.css' %}">
+{% endblock %}
+
+{% block content %}
+<div
+    class="mp-configurador"
+    id="modalidad-pago-configurador"
+    data-total="{{ cotizacion.total|unlocalize }}"
+    data-moneda="{{ cotizacion.moneda }}"
+>
+    <div class="encabezado-pagina mp-encabezado">
+        <div>
+            <p class="mp-sobrelinea">Configuración comercial</p>
+            <h1>Modalidades de pago</h1>
+            <p>
+                Define las alternativas que aparecerán en la propuesta del cliente.
+                Los montos se calculan automáticamente.
+            </p>
+        </div>
+        <a class="boton boton-secundario" href="{% url 'modalidades_pago:lista' %}">Volver</a>
+    </div>
+
+    <section class="mp-cotizacion-resumen" aria-label="Resumen de la cotización">
+        <div>
+            <span>Número</span>
+            <strong>{{ cotizacion.numero }}</strong>
+        </div>
+        <div>
+            <span>Cliente</span>
+            <strong>{{ cotizacion.oportunidad.empresa }}</strong>
+        </div>
+        <div class="mp-cotizacion-total">
+            <span>Valor del proyecto</span>
+            <strong data-salida="valor-proyecto">{{ cotizacion.moneda }} {{ cotizacion.total|floatformat:2|intcomma }}</strong>
+        </div>
+    </section>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="mensaje mensaje-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="mp-grid">
+            <section class="panel mp-tarjeta" data-seccion="pago-unico">
+                <div class="mp-tarjeta-cabecera">
+                    <div class="mp-icono">1</div>
+                    <div>
+                        <h2>Pago contado</h2>
+                        <p>El cliente paga el valor completo del proyecto al confirmar.</p>
+                    </div>
+                    <label class="mp-switch" title="Mostrar u ocultar esta alternativa">
+                        {{ form.mostrar_pago_unico }}
+                        <span class="mp-switch-control"></span>
+                        <span class="sr-only">{{ form.mostrar_pago_unico.label }}</span>
+                    </label>
+                </div>
+
+                <div class="mp-contenido-opcion">
+                    <div class="campo">
+                        <label for="{{ form.descuento_pago_unico.id_for_label }}">
+                            {{ form.descuento_pago_unico.label }}
+                        </label>
+                        <div class="mp-input-con-sufijo">
+                            {{ form.descuento_pago_unico }}
+                            <span>%</span>
+                        </div>
+                        <p class="mp-ayuda">
+                            Opcional. Se aplica sobre el valor total del proyecto. Déjalo en 0 si no ofrecerás descuento.
+                        </p>
+                        {{ form.descuento_pago_unico.errors }}
+                    </div>
+
+                    <div class="mp-resultado mp-resultado-verde">
+                        <div>
+                            <span>Precio normal</span>
+                            <strong data-salida="pago-unico-normal">—</strong>
+                        </div>
+                        <div>
+                            <span>Descuento</span>
+                            <strong data-salida="descuento-monto">—</strong>
+                        </div>
+                        <div class="mp-total-destacado">
+                            <span>Total a pagar</span>
+                            <strong data-salida="pago-unico-total">—</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel mp-tarjeta" data-seccion="plan-12">
+                <div class="mp-tarjeta-cabecera">
+                    <div class="mp-icono">2</div>
+                    <div>
+                        <h2>Pie + 12 cuotas</h2>
+                        <p>El cliente paga un pie inicial y financia el saldo durante 12 meses.</p>
+                    </div>
+                    <label class="mp-switch" title="Mostrar u ocultar esta alternativa">
+                        {{ form.mostrar_plan_12_meses }}
+                        <span class="mp-switch-control"></span>
+                        <span class="sr-only">{{ form.mostrar_plan_12_meses.label }}</span>
+                    </label>
+                </div>
+
+                <div class="mp-contenido-opcion">
+                    <div class="mp-campos-dos-columnas">
+                        <div class="campo">
+                            <label for="{{ form.porcentaje_pie.id_for_label }}">
+                                {{ form.porcentaje_pie.label }}
+                            </label>
+                            <div class="mp-input-con-sufijo">
+                                {{ form.porcentaje_pie }}
+                                <span>%</span>
+                            </div>
+                            <p class="mp-ayuda">Recomendado: 40% del valor del proyecto.</p>
+                            {{ form.porcentaje_pie.errors }}
+                        </div>
+
+                        <div class="campo">
+                            <label for="{{ form.mantencion_mensual.id_for_label }}">
+                                {{ form.mantencion_mensual.label }}
+                            </label>
+                            <div class="mp-input-con-prefijo">
+                                <span>$</span>
+                                {{ form.mantencion_mensual }}
+                            </div>
+                            <p class="mp-ayuda">
+                                Monto mensual adicional por hosting, soporte, respaldos u otros servicios recurrentes.
+                            </p>
+                            {{ form.mantencion_mensual.errors }}
+                        </div>
+                    </div>
+
+                    <div class="mp-plazo">
+                        <span>✓</span>
+                        Financiamiento fijo en <strong>12 cuotas mensuales</strong>
+                    </div>
+
+                    <div class="mp-resultado mp-resultado-azul">
+                        <div>
+                            <span>Pie inicial</span>
+                            <strong data-salida="pie-monto">—</strong>
+                        </div>
+                        <div>
+                            <span>Saldo a financiar</span>
+                            <strong data-salida="saldo-financiado">—</strong>
+                        </div>
+                        <div>
+                            <span>Cuota de desarrollo</span>
+                            <strong data-salida="cuota-desarrollo">—</strong>
+                        </div>
+                        <div>
+                            <span>Mantención mensual</span>
+                            <strong data-salida="mantencion-mensual">—</strong>
+                        </div>
+                        <div class="mp-total-destacado">
+                            <span>Cuota mensual final</span>
+                            <strong data-salida="cuota-final">—</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="panel mp-observaciones">
+            <div>
+                <h2>Observaciones comerciales</h2>
+                <p>Agrega condiciones o aclaraciones que acompañarán las modalidades.</p>
+            </div>
+            <div class="campo campo-completo">
+                <label for="{{ form.observaciones.id_for_label }}" class="sr-only">
+                    {{ form.observaciones.label }}
+                </label>
+                {{ form.observaciones }}
+                {{ form.observaciones.errors }}
+            </div>
+        </section>
+
+        <section class="panel mp-vista-previa">
+            <div class="mp-vista-previa-cabecera">
+                <div>
+                    <p class="mp-sobrelinea">Vista previa</p>
+                    <h2>Así se presentará al cliente</h2>
+                </div>
+                <span class="mp-estado-vivo">Cálculo automático</span>
+            </div>
+
+            <div class="mp-preview-grid">
+                <article class="mp-preview-card" data-preview="pago-unico">
+                    <span>Opción 1</span>
+                    <h3>Pago contado</h3>
+                    <p data-salida="preview-descuento">Sin descuento adicional</p>
+                    <strong data-salida="preview-pago-unico">—</strong>
+                </article>
+
+                <article class="mp-preview-card" data-preview="plan-12">
+                    <span>Opción 2</span>
+                    <h3>Pie + 12 cuotas</h3>
+                    <p><strong data-salida="preview-pie">—</strong> de pie inicial</p>
+                    <strong data-salida="preview-cuota">—</strong>
+                    <small>por mes, mantención incluida</small>
+                </article>
+            </div>
+        </section>
+
+        <div class="grupo-botones mp-acciones">
+            <button class="boton" type="submit">Guardar modalidades</button>
+            <a class="boton boton-secundario" href="{% url 'modalidades_pago:lista' %}">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'modalidades_pago/js/modalidad_formulario.js' %}"></script>
+{% endblock %}

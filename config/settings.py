@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'finanzas',
     'soporte',
     'encuestas',
+    'modalidades_pago',
 ]
 
 MIDDLEWARE = [

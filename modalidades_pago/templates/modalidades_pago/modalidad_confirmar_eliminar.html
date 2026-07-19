@@ -1,0 +1,3 @@
+{% extends "core/base.html" %}
+{% block title %}Eliminar modalidades | TG Management{% endblock %}
+{% block content %}<div class="encabezado-pagina"><h1>Eliminar modalidades de pago</h1><p>Se eliminará la configuración comercial de {{ cotizacion.numero }}. La cotización no será eliminada.</p></div><div class="panel"><form method="post">{% csrf_token %}<div class="grupo-botones"><button class="boton" type="submit">Confirmar eliminación</button><a class="boton boton-secundario" href="{% url 'modalidades_pago:detalle' cotizacion.pk %}">Cancelar</a></div></form></div>{% endblock %}

@@ -28,6 +28,7 @@ urlpatterns = [
     path("finanzas/",include("finanzas.urls")),
     path("soporte/", include("soporte.urls")),
     path("encuestas/", include("encuestas.urls")),
+    path("modalidades-pago/", include("modalidades_pago.urls")),
 
     # Autenticación
     path("accounts/", include("django.contrib.auth.urls")),

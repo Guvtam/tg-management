@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'cotizaciones',
     'proyectos',
     'finanzas',
+    'soporte',
 ]
 
 MIDDLEWARE = [

@@ -23,7 +23,7 @@ urlpatterns = [
     path("crm/", include("crm.urls")),
     path("cotizaciones/",include("cotizaciones.urls")),
     path("proyectos/",include("proyectos.urls")),
-    path("finanzas/",include("finanzas.urls"),
-    ),
+    path("finanzas/",include("finanzas.urls")),
+    path("soporte/", include("soporte.urls")),
 
 ]

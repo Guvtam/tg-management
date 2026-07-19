@@ -1,0 +1,174 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Soporte | TG Management
+{% endblock %}
+
+{% block content %}
+
+    <div class="encabezado-pagina">
+        <h1>Soporte</h1>
+
+        <p>
+            Tickets de incidencias, solicitudes y mantención de clientes.
+            {{ total_abiertos }} abiertos, {{ total_vencidos }} fuera de plazo SLA.
+        </p>
+    </div>
+
+    <div class="acciones">
+
+        <form method="get" class="filtros">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="Buscar ticket, código o cliente"
+            >
+
+            <select name="estado">
+                <option value="">Todos los estados</option>
+
+                {% for valor, etiqueta in estados %}
+                    <option
+                        value="{{ valor }}"
+                        {% if estado_seleccionado == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="prioridad">
+                <option value="">Todas las prioridades</option>
+
+                {% for valor, etiqueta in prioridades %}
+                    <option
+                        value="{{ valor }}"
+                        {% if prioridad_seleccionada == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label style="display:flex; align-items:center; gap:4px;">
+                <input
+                    type="checkbox"
+                    name="vencidos"
+                    value="1"
+                    {% if solo_vencidos %}checked{% endif %}
+                >
+                Solo vencidos
+            </label>
+
+            <button type="submit" class="boton">
+                Filtrar
+            </button>
+
+            {% if busqueda or estado_seleccionado or prioridad_seleccionada or solo_vencidos %}
+                <a
+                    href="{% url 'soporte:ticket_lista' %}"
+                    class="boton boton-secundario"
+                >
+                    Limpiar
+                </a>
+            {% endif %}
+
+        </form>
+
+        <a
+            href="{% url 'soporte:ticket_crear' %}"
+            class="boton"
+        >
+            Nuevo ticket
+        </a>
+
+    </div>
+
+    <div class="panel">
+
+        {% if tickets %}
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticket</th>
+                            <th>Cliente</th>
+                            <th>Categoría</th>
+                            <th>Prioridad</th>
+                            <th>Estado</th>
+                            <th>Responsable</th>
+                            <th>SLA</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for ticket in tickets %}
+                            <tr>
+                                <td>
+                                    <a
+                                        href="{% url 'soporte:ticket_detalle' ticket.pk %}"
+                                        class="enlace-tabla"
+                                    >
+                                        {{ ticket.codigo }} — {{ ticket.titulo }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ ticket.empresa }}
+                                </td>
+
+                                <td>
+                                    {{ ticket.get_categoria_display }}
+                                </td>
+
+                                <td>
+                                    {{ ticket.get_prioridad_display }}
+                                </td>
+
+                                <td>
+                                    {% if ticket.estado == "resuelto" or ticket.estado == "cerrado" %}
+                                        <span class="estado estado-completado">
+                                            {{ ticket.get_estado_display }}
+                                        </span>
+                                    {% elif ticket.esta_vencido %}
+                                        <span class="estado estado-inactivo">
+                                            {{ ticket.get_estado_display }} — vencido
+                                        </span>
+                                    {% else %}
+                                        <span class="estado estado-pendiente">
+                                            {{ ticket.get_estado_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ ticket.responsable|default:"—" }}
+                                </td>
+
+                                <td>
+                                    {{ ticket.fecha_limite_respuesta|date:"d-m-Y H:i"|default:"—" }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="sin-registros">
+                No se encontraron tickets.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

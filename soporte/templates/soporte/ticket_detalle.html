@@ -1,0 +1,218 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ ticket.codigo }} | TG Management
+{% endblock %}
+
+{% block content %}
+
+<div class="encabezado-pagina">
+    <h1>{{ ticket.titulo }}</h1>
+
+    <p>
+        {{ ticket.codigo }} ·
+        {{ ticket.empresa }}
+    </p>
+</div>
+
+<div class="acciones">
+    <div class="grupo-botones">
+        <a
+            href="{% url 'soporte:ticket_editar' ticket.pk %}"
+            class="boton boton-secundario"
+        >
+            Editar ticket
+        </a>
+    </div>
+
+    <a
+        href="{% url 'soporte:ticket_lista' %}"
+        class="boton boton-secundario"
+    >
+        Volver
+    </a>
+</div>
+
+<section class="panel">
+    <h2>Información del ticket</h2>
+
+    <div class="detalle-grid">
+
+        <div class="detalle-item">
+            <p>Código</p>
+            <strong>{{ ticket.codigo }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Cliente</p>
+            <strong>{{ ticket.empresa }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Reportado por</p>
+            <strong>{{ ticket.contacto|default:"—" }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Proyecto asociado</p>
+            <strong>
+                {% if ticket.proyecto %}
+                    <a href="{% url 'proyectos:proyecto_detalle' ticket.proyecto.pk %}" class="enlace-tabla">
+                        {{ ticket.proyecto }}
+                    </a>
+                {% else %}
+                    —
+                {% endif %}
+            </strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Categoría</p>
+            <strong>{{ ticket.get_categoria_display }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Canal</p>
+            <strong>{{ ticket.get_canal_display }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Prioridad</p>
+            <strong>{{ ticket.get_prioridad_display }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Estado</p>
+            <span class="estado estado-{{ ticket.estado }}">
+                {{ ticket.get_estado_display }}
+                {% if ticket.esta_vencido %}
+                    — fuera de plazo SLA
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="detalle-item">
+            <p>Responsable</p>
+            <strong>
+                {% if ticket.responsable %}
+                    {{ ticket.responsable.get_full_name|default:ticket.responsable.username }}
+                {% else %}
+                    —
+                {% endif %}
+            </strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Fecha de reporte</p>
+            <strong>{{ ticket.fecha_reporte|date:"d-m-Y H:i" }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Límite de primera respuesta (SLA)</p>
+            <strong>{{ ticket.fecha_limite_respuesta|date:"d-m-Y H:i"|default:"—" }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Primera respuesta</p>
+            <strong>{{ ticket.fecha_primera_respuesta|date:"d-m-Y H:i"|default:"—" }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Resolución</p>
+            <strong>{{ ticket.fecha_resolucion|date:"d-m-Y H:i"|default:"—" }}</strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Horas dedicadas</p>
+            <strong>{{ ticket.horas_dedicadas }}</strong>
+        </div>
+
+    </div>
+
+    {% if ticket.descripcion %}
+        <div class="detalle-item campo-completo" style="margin-top:16px;">
+            <p>Descripción</p>
+            <strong>{{ ticket.descripcion|linebreaksbr }}</strong>
+        </div>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Cambiar estado / horas</h2>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-grid">
+            {% for field in estado_form %}
+                <div class="campo">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="acciones-formulario">
+            <button type="submit" class="boton">
+                Actualizar ticket
+            </button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Bitácora de interacciones</h2>
+
+    {% if interacciones %}
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Autor</th>
+                        <th>Mensaje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interaccion in interacciones %}
+                        <tr>
+                            <td>{{ interaccion.fecha_creacion|date:"d-m-Y H:i" }}</td>
+                            <td>{{ interaccion.get_tipo_display }}</td>
+                            <td>{{ interaccion.autor|default:"—" }}</td>
+                            <td>{{ interaccion.mensaje }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="sin-registros">
+            Aún no hay interacciones registradas en este ticket.
+        </div>
+    {% endif %}
+
+    <form method="post" novalidate style="margin-top:16px;">
+        {% csrf_token %}
+        <input type="hidden" name="agregar_interaccion" value="1">
+
+        <div class="form-grid">
+            {% for field in interaccion_form %}
+                <div class="campo {% if field.name == 'mensaje' %}campo-completo{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="acciones-formulario">
+            <button type="submit" class="boton">
+                Agregar interacción
+            </button>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

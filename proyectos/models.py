@@ -82,13 +82,13 @@ class Proyecto(models.Model):
     )
 
     fecha_alta = models.DateField(
-        "Inicio planificado",
+        "Fecha Alta",
         blank=True,
         null=True,
     )
 
     fecha_entrega = models.DateField(
-        "Fin planificado",
+        "Fecha Entrega",
         blank=True,
         null=True,
     )

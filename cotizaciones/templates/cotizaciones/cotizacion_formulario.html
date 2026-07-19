@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% block title %}
     {{ titulo }} | TG Management
@@ -29,7 +30,26 @@
 
                 {% for field in form %}
 
+                    {% if field.name == "modalidad_pago" %}
+                        <div class="campo campo-completo">
+                            <h2>Condiciones de pago</h2>
+                        </div>
+                    {% endif %}
+
                     <div
+                        id="
+                            {% if field.name == 'porcentaje_anticipo' %}
+                                grupo-porcentaje-anticipo
+                            {% elif field.name == 'numero_cuotas' %}
+                                grupo-numero-cuotas
+                            {% elif field.name == 'monto_servicio_mensual' %}
+                                grupo-monto-servicio
+                            {% elif field.name == 'meses_servicio' %}
+                                grupo-meses-servicio
+                            {% elif field.name == 'fecha_inicio_servicio' %}
+                                grupo-fecha-inicio-servicio
+                            {% endif %}
+                        "
                         class="campo
                         {% if field.name == 'alcance' or field.name == 'exclusiones' or field.name == 'observaciones' %}
                             campo-completo
@@ -91,5 +111,8 @@
         </form>
 
     </div>
+
+    <script src="{% static 'core/js/cotizacion_form.js' %}">
+    </script>
 
 {% endblock %}

@@ -1,0 +1,56 @@
+from django.urls import path
+
+from . import views
+
+
+app_name = "finanzas"
+
+
+urlpatterns = [
+    path(
+        "",
+        views.finanzas_inicio,
+        name="finanzas_inicio",
+    ),
+    path(
+        "ingresos/nuevo/",
+        views.ingreso_crear,
+        name="ingreso_crear",
+    ),
+    path(
+        "ingresos/<int:pk>/editar/",
+        views.ingreso_editar,
+        name="ingreso_editar",
+    ),
+    path(
+        "ingresos/<int:pk>/eliminar/",
+        views.ingreso_eliminar,
+        name="ingreso_eliminar",
+    ),
+    path(
+        "gastos/nuevo/",
+        views.gasto_crear,
+        name="gasto_crear",
+    ),
+    path(
+        "gastos/<int:pk>/editar/",
+        views.gasto_editar,
+        name="gasto_editar",
+    ),
+    path(
+        "gastos/<int:pk>/eliminar/",
+        views.gasto_eliminar,
+        name="gasto_eliminar",
+    ),
+    path(
+        "ajax/proyectos/",
+        views.obtener_proyectos,
+        name="ajax_proyectos",
+    ),
+
+    path(
+        "ajax/cotizaciones/",
+        views.obtener_cotizaciones,
+        name="ajax_cotizaciones",
+    ),
+]

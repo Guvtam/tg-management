@@ -44,6 +44,53 @@ class CotizacionForm(forms.ModelForm):
                     "class": "form-control",
                 }
             ),
+            
+            
+            "fecha_inicio_servicio": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                }
+            ),
+            "modalidad_pago": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "porcentaje_anticipo": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "0",
+                    "max": "100",
+                    "step": "0.01",
+                    "placeholder": "Ejemplo: 30",
+                }
+            ),
+            "numero_cuotas": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "1",
+                    "step": "1",
+                    "placeholder": "Ejemplo: 3",
+                }
+            ),
+            "monto_servicio_mensual": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "0",
+                    "step": "0.01",
+                    "placeholder": "Valor mensual",
+                }
+            ),
+            "meses_servicio": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "1",
+                    "step": "1",
+                    "placeholder": "Ejemplo: 12",
+                }
+            ),
+        
             "moneda": forms.Select(
                 attrs={
                     "class": "form-control",
@@ -125,6 +172,7 @@ class CotizacionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Opciones vacías de los select
         self.fields["oportunidad"].empty_label = (
             "Seleccione una oportunidad"
         )
@@ -133,6 +181,7 @@ class CotizacionForm(forms.ModelForm):
             "Seleccione un contacto"
         )
 
+        # Formatos aceptados para fechas
         self.fields["fecha_emision"].input_formats = [
             "%Y-%m-%d",
         ]
@@ -141,8 +190,68 @@ class CotizacionForm(forms.ModelForm):
             "%Y-%m-%d",
         ]
 
+        self.fields["fecha_inicio_servicio"].input_formats = [
+            "%Y-%m-%d",
+        ]
+
+        # Campos opcionales generales
         self.fields["contacto"].required = False
         self.fields["fecha_vencimiento"].required = False
+
+        # Campos que dependen de la modalidad de pago
+        campos_pago_opcionales = [
+            "porcentaje_anticipo",
+            "numero_cuotas",
+            "monto_servicio_mensual",
+            "meses_servicio",
+            "fecha_inicio_servicio",
+        ]
+
+        for nombre_campo in campos_pago_opcionales:
+            if nombre_campo in self.fields:
+                self.fields[nombre_campo].required = False
+
+        # Etiquetas
+        self.fields["modalidad_pago"].label = (
+            "Modalidad de pago"
+        )
+
+        self.fields["porcentaje_anticipo"].label = (
+            "Porcentaje de anticipo"
+        )
+
+        self.fields["numero_cuotas"].label = (
+            "Cantidad de cuotas del saldo"
+        )
+
+        self.fields["monto_servicio_mensual"].label = (
+            "Valor mensual del servicio"
+        )
+
+        self.fields["meses_servicio"].label = (
+            "Duración del servicio en meses"
+        )
+
+        self.fields["fecha_inicio_servicio"].label = (
+            "Inicio del servicio mensual"
+        )
+
+        # Textos de ayuda
+        self.fields["porcentaje_anticipo"].help_text = (
+            "Ejemplo: ingresa 30 para un anticipo del 30 %."
+        )
+
+        self.fields["numero_cuotas"].help_text = (
+            "Cantidad de cuotas en que se dividirá el saldo."
+        )
+
+        self.fields["monto_servicio_mensual"].help_text = (
+            "Valor que se cobrará mensualmente por el servicio."
+        )
+
+        self.fields["meses_servicio"].help_text = (
+            "Cantidad de meses durante los cuales se cobrará el servicio."
+        )
 
     def clean(self):
         cleaned_data = super().clean()

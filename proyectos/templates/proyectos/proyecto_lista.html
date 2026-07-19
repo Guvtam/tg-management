@@ -78,7 +78,7 @@
                         <th>Estado</th>
                         <th>Prioridad</th>
                         <th>Avance</th>
-                        <th>Fin planificado</th>
+                        <th>Fecha Entrega</th>
                     </tr>
                 </thead>
 
@@ -132,7 +132,7 @@
                             </td>
 
                             <td>
-                                {{ proyecto.fecha_fin_planificada|date:"d-m-Y"|default:"—" }}
+                                {{ proyecto.fecha_entrega|date:"d-m-Y"|default:"—" }}
                             </td>
                         </tr>
                     {% endfor %}

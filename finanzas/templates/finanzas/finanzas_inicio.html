@@ -1,0 +1,398 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Finanzas | TG Management
+{% endblock %}
+
+{% block content %}
+
+<div class="encabezado-pagina">
+    <h1>Finanzas</h1>
+
+    <p>
+        Control de ingresos, gastos y saldo del negocio.
+    </p>
+</div>
+
+<div class="acciones">
+    <div class="grupo-botones">
+        <a
+            href="{% url 'finanzas:ingreso_crear' %}"
+            class="boton"
+        >
+            Nuevo ingreso
+        </a>
+
+        <a
+            href="{% url 'finanzas:gasto_crear' %}"
+            class="boton boton-secundario"
+        >
+            Nuevo gasto
+        </a>
+    </div>
+</div>
+
+<form method="get" class="panel filtros-form">
+    <div class="form-grid">
+        <div class="campo">
+            <label for="q">Buscar</label>
+
+            <input
+                type="text"
+                name="q"
+                id="q"
+                value="{{ busqueda }}"
+                class="form-control"
+                placeholder="Concepto, cliente, proveedor o proyecto"
+            >
+        </div>
+
+        <div class="campo">
+            <label for="moneda">Moneda</label>
+
+            <select
+                name="moneda"
+                id="moneda"
+                class="form-control"
+            >
+                {% for valor, nombre in monedas %}
+                    <option
+                        value="{{ valor }}"
+                        {% if moneda_seleccionada == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ valor }} - {{ nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="fecha_desde">Desde</label>
+
+            <input
+                type="date"
+                name="fecha_desde"
+                id="fecha_desde"
+                value="{{ fecha_desde }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="campo">
+            <label for="fecha_hasta">Hasta</label>
+
+            <input
+                type="date"
+                name="fecha_hasta"
+                id="fecha_hasta"
+                value="{{ fecha_hasta }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="campo">
+            <label for="estado">Estado del ingreso</label>
+
+            <select
+                name="estado"
+                id="estado"
+                class="form-control"
+            >
+                <option value="">Todos</option>
+
+                {% for valor, nombre in estados %}
+                    <option
+                        value="{{ valor }}"
+                        {% if estado_seleccionado == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="boton">
+            Filtrar
+        </button>
+
+        <a
+            href="{% url 'finanzas:finanzas_inicio' %}"
+            class="boton boton-secundario"
+        >
+            Limpiar
+        </a>
+    </div>
+</form>
+
+<div class="resumen-finanzas">
+    <div class="tarjeta-resumen">
+        <span>Ingresos emitidos</span>
+
+        <strong>
+            {{ moneda_seleccionada }}
+            {{ total_ingresos|floatformat:0 }}
+        </strong>
+    </div>
+
+    <div class="tarjeta-resumen">
+        <span>Ingresos pagados</span>
+
+        <strong>
+            {{ moneda_seleccionada }}
+            {{ ingresos_pagados|floatformat:0 }}
+        </strong>
+    </div>
+
+    <div class="tarjeta-resumen">
+        <span>Por cobrar</span>
+
+        <strong>
+            {{ moneda_seleccionada }}
+            {{ ingresos_pendientes|floatformat:0 }}
+        </strong>
+    </div>
+
+    <div class="tarjeta-resumen">
+        <span>Gastos</span>
+
+        <strong>
+            {{ moneda_seleccionada }}
+            {{ total_gastos|floatformat:0 }}
+        </strong>
+    </div>
+
+    <div class="tarjeta-resumen">
+        <span>Saldo real</span>
+
+        <strong>
+            {{ moneda_seleccionada }}
+            {{ saldo|floatformat:0 }}
+        </strong>
+    </div>
+</div>
+
+<section class="panel">
+    <div class="acciones">
+        <div>
+            <h2>Ingresos</h2>
+
+            <p class="texto-secundario">
+                Cobros emitidos y pagos recibidos.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'finanzas:ingreso_crear' %}"
+            class="boton"
+        >
+            Nuevo ingreso
+        </a>
+    </div>
+
+    {% if ingresos %}
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Cliente</th>
+                        <th>Proyecto</th>
+                        <th>Estado</th>
+                        <th>Monto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for ingreso in ingresos %}
+                        <tr>
+                            <td>
+                                {{ ingreso.fecha_emision|date:"d-m-Y" }}
+                            </td>
+
+                            <td>
+                                <strong>{{ ingreso.concepto }}</strong>
+
+                                {% if ingreso.cotizacion %}
+                                    <div class="texto-secundario">
+                                        {{ ingreso.cotizacion.numero }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ ingreso.empresa.nombre }}
+                            </td>
+
+                            <td>
+                                {% if ingreso.proyecto %}
+                                    {{ ingreso.proyecto.codigo }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="estado estado-{{ ingreso.estado }}">
+                                    {{ ingreso.get_estado_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ ingreso.moneda }}
+                                    {{ ingreso.monto|floatformat:0 }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                <div class="grupo-botones">
+                                    <a
+                                        href="{% url 'finanzas:ingreso_editar' ingreso.pk %}"
+                                        class="boton boton-secundario boton-pequeno"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'finanzas:ingreso_eliminar' ingreso.pk %}"
+                                        class="formulario-inline"
+                                        onsubmit="return confirm('¿Eliminar este ingreso?');"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="boton boton-peligro boton-pequeno"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="sin-registros">
+            No existen ingresos registrados.
+        </div>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <div class="acciones">
+        <div>
+            <h2>Gastos</h2>
+
+            <p class="texto-secundario">
+                Costos y egresos del negocio.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'finanzas:gasto_crear' %}"
+            class="boton"
+        >
+            Nuevo gasto
+        </a>
+    </div>
+
+    {% if gastos %}
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Categoría</th>
+                        <th>Proveedor</th>
+                        <th>Proyecto</th>
+                        <th>Monto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for gasto in gastos %}
+                        <tr>
+                            <td>
+                                {{ gasto.fecha|date:"d-m-Y" }}
+                            </td>
+
+                            <td>
+                                <strong>{{ gasto.concepto }}</strong>
+                            </td>
+
+                            <td>
+                                {{ gasto.get_categoria_display }}
+                            </td>
+
+                            <td>
+                                {{ gasto.proveedor|default:"—" }}
+                            </td>
+
+                            <td>
+                                {% if gasto.proyecto %}
+                                    {{ gasto.proyecto.codigo }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ gasto.moneda }}
+                                    {{ gasto.monto|floatformat:0 }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                <div class="grupo-botones">
+                                    <a
+                                        href="{% url 'finanzas:gasto_editar' gasto.pk %}"
+                                        class="boton boton-secundario boton-pequeno"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'finanzas:gasto_eliminar' gasto.pk %}"
+                                        class="formulario-inline"
+                                        onsubmit="return confirm('¿Eliminar este gasto?');"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="boton boton-peligro boton-pequeno"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="sin-registros">
+            No existen gastos registrados.
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

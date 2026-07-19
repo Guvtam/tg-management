@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'crm',
     'cotizaciones',
     'proyectos',
+    'finanzas',
 ]
 
 MIDDLEWARE = [

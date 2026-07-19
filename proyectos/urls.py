@@ -23,6 +23,7 @@ urlpatterns = [
         name="cotizaciones_por_empresa",
     ),
 
+    # Actividades
     path(
         "<int:proyecto_pk>/actividades/nueva/",
         views.actividad_crear,
@@ -39,6 +40,34 @@ urlpatterns = [
         name="actividad_eliminar",
     ),
 
+    # Documentos
+    path(
+        "<int:proyecto_pk>/documentos/nuevo/",
+        views.documento_crear,
+        name="documento_crear",
+    ),
+    path(
+        "documentos/<int:pk>/editar/",
+        views.documento_editar,
+        name="documento_editar",
+    ),
+    path(
+        "documentos/<int:pk>/visualizar/",
+        views.documento_visualizar,
+        name="documento_visualizar",
+    ),
+    path(
+        "documentos/<int:pk>/descargar/",
+        views.documento_descargar,
+        name="documento_descargar",
+    ),
+    path(
+        "documentos/<int:pk>/eliminar/",
+        views.documento_eliminar,
+        name="documento_eliminar",
+    ),
+
+    # Proyecto
     path(
         "<int:pk>/editar/",
         views.proyecto_editar,

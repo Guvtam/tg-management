@@ -25,6 +25,13 @@
         </a>
 
         <a
+            href="{% url 'proyectos:documento_crear' proyecto.pk %}"
+            class="boton"
+        >
+            Nuevo documento
+        </a>
+
+        <a
             href="{% url 'proyectos:proyecto_editar' proyecto.pk %}"
             class="boton boton-secundario"
         >
@@ -116,6 +123,14 @@
 
             <strong>
                 {{ total_actividades }}
+            </strong>
+        </div>
+
+        <div class="detalle-item">
+            <p>Documentos asociados</p>
+
+            <strong>
+                {{ documentos|length }}
             </strong>
         </div>
 
@@ -277,6 +292,162 @@
             Este proyecto todavía no tiene actividades.
         </div>
     {% endif %}
+</section>
+
+<section class="panel">
+
+    <div class="acciones">
+
+        <div>
+            <h2>Documentos del proyecto</h2>
+
+            <p class="texto-secundario">
+                Contratos, minutas, requerimientos, informes
+                y otros archivos relacionados con el proyecto.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'proyectos:documento_crear' proyecto.pk %}"
+            class="boton"
+        >
+            Nuevo documento
+        </a>
+
+    </div>
+
+    {% if documentos %}
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Tipo</th>
+                        <th>Archivo</th>
+                        <th>Cargado por</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for documento in documentos %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ documento.nombre }}
+                                </strong>
+
+                                {% if documento.descripcion %}
+                                    <div class="texto-secundario">
+                                        {{ documento.descripcion|truncatechars:90 }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ documento.get_tipo_display }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ documento.nombre_archivo }}
+                                </strong>
+
+                                <div class="texto-secundario">
+                                    {{ documento.extension|upper }}
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if documento.cargado_por %}
+                                    {{ documento.cargado_por.get_full_name|default:documento.cargado_por.username }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ documento.creado_en|date:"d-m-Y H:i" }}
+                            </td>
+
+                            <td>
+
+                                <div class="grupo-botones">
+
+                                    {% if documento.es_visualizable %}
+
+                                        <a
+                                            href="{% url 'proyectos:documento_visualizar' documento.pk %}"
+                                            class="boton boton-secundario boton-pequeno"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            Ver
+                                        </a>
+
+                                    {% endif %}
+
+                                    <a
+                                        href="{% url 'proyectos:documento_descargar' documento.pk %}"
+                                        class="boton boton-secundario boton-pequeno"
+                                    >
+                                        Descargar
+                                    </a>
+
+                                    <a
+                                        href="{% url 'proyectos:documento_editar' documento.pk %}"
+                                        class="boton boton-secundario boton-pequeno"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <a
+                                        href="{% url 'proyectos:documento_eliminar' documento.pk %}"
+                                        class="boton boton-peligro boton-pequeno"
+                                    >
+                                        Eliminar
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="estado-vacio">
+
+            <p>
+                Este proyecto todavía no tiene documentos asociados.
+            </p>
+
+            <a
+                href="{% url 'proyectos:documento_crear' proyecto.pk %}"
+                class="boton"
+            >
+                Cargar primer documento
+            </a>
+
+        </div>
+
+    {% endif %}
+
 </section>
 
 {% endblock %}

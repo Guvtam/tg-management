@@ -1,13 +1,24 @@
+import mimetypes
+import os
+
 from django.contrib import messages
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from cotizaciones.models import Cotizacion
 
-from .forms import ActividadProyectoForm, ProyectoForm
-from .models import ActividadProyecto, Proyecto
+from .forms import (
+    ActividadProyectoForm,
+    DocumentoProyectoForm,
+    ProyectoForm,
+)
 
+from .models import (
+    ActividadProyecto,
+    DocumentoProyecto,
+    Proyecto,
+)
 
 
 def proyecto_lista(request):
@@ -97,6 +108,12 @@ def proyecto_detalle(request, pk):
         .all()
     )
 
+    documentos = (
+        proyecto.documentos
+        .select_related("cargado_por")
+        .all()
+    )
+
     total_actividades = actividades.count()
 
     actividades_completadas = actividades.filter(
@@ -113,6 +130,7 @@ def proyecto_detalle(request, pk):
     context = {
         "proyecto": proyecto,
         "actividades": actividades,
+        "documentos": documentos,
         "total_actividades": total_actividades,
         "actividades_completadas": actividades_completadas,
         "avance_actividades": avance_actividades,
@@ -332,4 +350,229 @@ def cotizaciones_por_empresa(request):
         {
             "cotizaciones": resultados,
         }
+    )
+
+
+def documento_crear(request, proyecto_pk):
+    proyecto = get_object_or_404(
+        Proyecto.objects.select_related("empresa"),
+        pk=proyecto_pk,
+    )
+
+    if request.method == "POST":
+        form = DocumentoProyectoForm(
+            request.POST,
+            request.FILES,
+        )
+
+        if form.is_valid():
+            documento = form.save(commit=False)
+            documento.proyecto = proyecto
+
+            if request.user.is_authenticated:
+                documento.cargado_por = request.user
+
+            documento.save()
+
+            messages.success(
+                request,
+                "Documento cargado correctamente.",
+            )
+
+            return redirect(
+                "proyectos:proyecto_detalle",
+                pk=proyecto.pk,
+            )
+    else:
+        form = DocumentoProyectoForm()
+
+    context = {
+        "form": form,
+        "proyecto": proyecto,
+        "titulo": "Agregar documento",
+        "boton": "Cargar documento",
+    }
+
+    return render(
+        request,
+        "proyectos/documento_form.html",
+        context,
+    )
+
+def documento_editar(request, pk):
+    documento = get_object_or_404(
+        DocumentoProyecto.objects.select_related(
+            "proyecto",
+            "proyecto__empresa",
+        ),
+        pk=pk,
+    )
+
+    archivo_anterior = documento.archivo
+
+    if request.method == "POST":
+        form = DocumentoProyectoForm(
+            request.POST,
+            request.FILES,
+            instance=documento,
+        )
+
+        if form.is_valid():
+            documento_actualizado = form.save(commit=False)
+
+            nuevo_archivo = request.FILES.get("archivo")
+
+            documento_actualizado.save()
+
+            if (
+                nuevo_archivo
+                and archivo_anterior
+                and archivo_anterior.name
+                != documento_actualizado.archivo.name
+            ):
+                archivo_anterior.delete(save=False)
+
+            messages.success(
+                request,
+                "Documento actualizado correctamente.",
+            )
+
+            return redirect(
+                "proyectos:proyecto_detalle",
+                pk=documento.proyecto.pk,
+            )
+    else:
+        form = DocumentoProyectoForm(
+            instance=documento,
+        )
+
+    context = {
+        "form": form,
+        "proyecto": documento.proyecto,
+        "documento": documento,
+        "titulo": "Editar documento",
+        "boton": "Guardar cambios",
+    }
+
+    return render(
+        request,
+        "proyectos/documento_form.html",
+        context,
+    )
+
+def documento_visualizar(request, pk):
+    documento = get_object_or_404(
+        DocumentoProyecto,
+        pk=pk,
+    )
+
+    if not documento.archivo:
+        raise Http404("El documento no tiene un archivo asociado.")
+
+    try:
+        archivo = documento.archivo.open("rb")
+    except FileNotFoundError as exc:
+        raise Http404(
+            "El archivo no existe en el almacenamiento."
+        ) from exc
+
+    tipo_contenido, _ = mimetypes.guess_type(
+        documento.archivo.name
+    )
+
+    tipo_contenido = (
+        tipo_contenido
+        or "application/octet-stream"
+    )
+
+    respuesta = FileResponse(
+        archivo,
+        content_type=tipo_contenido,
+    )
+
+    nombre = os.path.basename(
+        documento.archivo.name
+    )
+
+    respuesta["Content-Disposition"] = (
+        f'inline; filename="{nombre}"'
+    )
+
+    return respuesta
+
+
+def documento_descargar(request, pk):
+    documento = get_object_or_404(
+        DocumentoProyecto,
+        pk=pk,
+    )
+
+    if not documento.archivo:
+        raise Http404("El documento no tiene un archivo asociado.")
+
+    try:
+        archivo = documento.archivo.open("rb")
+    except FileNotFoundError as exc:
+        raise Http404(
+            "El archivo no existe en el almacenamiento."
+        ) from exc
+
+    nombre = os.path.basename(
+        documento.archivo.name
+    )
+
+    tipo_contenido, _ = mimetypes.guess_type(
+        documento.archivo.name
+    )
+
+    tipo_contenido = (
+        tipo_contenido
+        or "application/octet-stream"
+    )
+
+    return FileResponse(
+        archivo,
+        as_attachment=True,
+        filename=nombre,
+        content_type=tipo_contenido,
+    )
+
+
+def documento_eliminar(request, pk):
+    documento = get_object_or_404(
+        DocumentoProyecto.objects.select_related(
+            "proyecto"
+        ),
+        pk=pk,
+    )
+
+    proyecto_pk = documento.proyecto.pk
+
+    if request.method == "POST":
+        archivo = documento.archivo
+
+        documento.delete()
+
+        if archivo:
+            archivo.delete(save=False)
+
+        messages.success(
+            request,
+            "Documento eliminado correctamente.",
+        )
+
+        return redirect(
+            "proyectos:proyecto_detalle",
+            pk=proyecto_pk,
+        )
+
+    context = {
+        "documento": documento,
+        "proyecto": documento.proyecto,
+    }
+
+    return render(
+        request,
+        "proyectos/documento_confirmar_eliminar.html",
+        context,
     )

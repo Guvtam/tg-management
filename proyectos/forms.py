@@ -1,6 +1,7 @@
+import os
 from django import forms
 
-from .models import Proyecto, ActividadProyecto
+from .models import Proyecto, ActividadProyecto, DocumentoProyecto
 from cotizaciones.models import Cotizacion
 
 
@@ -191,3 +192,95 @@ class ActividadProyectoForm(forms.ModelForm):
                 }
             ),
         }
+
+
+class DocumentoProyectoForm(forms.ModelForm):
+    class Meta:
+        model = DocumentoProyecto
+
+        fields = [
+            "nombre",
+            "tipo",
+            "descripcion",
+            "archivo",
+        ]
+
+        widgets = {
+            "nombre": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ej.: Minuta reunión inicial",
+                }
+            ),
+            "tipo": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "descripcion": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": (
+                        "Descripción, versión, propósito "
+                        "u observaciones del documento"
+                    ),
+                }
+            ),
+            "archivo": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": (
+                        ".pdf,.doc,.docx,.xls,.xlsx,"
+                        ".ppt,.pptx,.txt,.csv,"
+                        ".jpg,.jpeg,.png,.webp,.zip"
+                    ),
+                }
+            ),
+        }
+
+    def clean_archivo(self):
+        archivo = self.cleaned_data.get("archivo")
+
+        # Cuando se edita un documento sin reemplazar el archivo,
+        # Django puede conservar el archivo actual.
+        if not archivo:
+            return archivo
+
+        extensiones_permitidas = {
+            ".pdf",
+            ".doc",
+            ".docx",
+            ".xls",
+            ".xlsx",
+            ".ppt",
+            ".pptx",
+            ".txt",
+            ".csv",
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp",
+            ".zip",
+        }
+
+        
+
+        extension = os.path.splitext(archivo.name)[1].lower()
+
+        if extension not in extensiones_permitidas:
+            raise forms.ValidationError(
+                "El tipo de archivo no está permitido. "
+                "Puede cargar PDF, Word, Excel, PowerPoint, "
+                "imágenes, texto, CSV o ZIP."
+            )
+
+        limite_mb = 20
+        limite_bytes = limite_mb * 1024 * 1024
+
+        if archivo.size > limite_bytes:
+            raise forms.ValidationError(
+                f"El archivo no puede superar los {limite_mb} MB."
+            )
+
+        return archivo

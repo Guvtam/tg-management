@@ -1,8 +1,7 @@
 {% extends "core/base_login.html" %}
 
-
 {% block title %}
-    Iniciar sesión | TG Technology
+    Iniciar sesión | TG Management
 {% endblock %}
 
 {% block content %}
@@ -10,68 +9,88 @@
 <div class="encabezado-login">
 
     <span class="etiqueta-login">
-        TG Management
+        Acceso seguro
     </span>
 
     <h2>Bienvenida</h2>
 
     <p>
-        Ingresa tus credenciales para acceder al sistema.
+        Ingresa tus credenciales para acceder a TG Management.
     </p>
 
 </div>
 
 {% if form.errors %}
-    <div class="mensaje-error mensaje-login">
-        El usuario o la contraseña no son correctos.
+    <div class="alerta-login">
+        <strong>No fue posible iniciar sesión.</strong>
+
+        <span>
+            Revisa tu usuario y contraseña e inténtalo nuevamente.
+        </span>
     </div>
 {% endif %}
 
-<form method="post" class="formulario-login">
+<form method="post" class="formulario-login" novalidate>
     {% csrf_token %}
 
-    <div class="campo-login">
+    <div class="grupo-campo-login">
 
         <label for="{{ form.username.id_for_label }}">
             Usuario
         </label>
 
-        <input
-            type="text"
-            name="username"
-            id="{{ form.username.id_for_label }}"
-            value="{{ form.username.value|default:'' }}"
-            autocomplete="username"
-            placeholder="Ingresa tu usuario"
-            required
-            autofocus
-        >
+        <div class="control-login">
+
+            <span class="icono-control-login">
+                👤
+            </span>
+
+            <input
+                type="text"
+                name="username"
+                id="{{ form.username.id_for_label }}"
+                value="{{ form.username.value|default:'' }}"
+                placeholder="Ingresa tu usuario"
+                autocomplete="username"
+                required
+                autofocus
+            >
+
+        </div>
 
         {% if form.username.errors %}
-            <div class="error-campo">
+            <div class="error-login">
                 {{ form.username.errors }}
             </div>
         {% endif %}
 
     </div>
 
-    <div class="campo-login">
+    <div class="grupo-campo-login">
 
         <label for="{{ form.password.id_for_label }}">
             Contraseña
         </label>
 
-        <input
-            type="password"
-            name="password"
-            id="{{ form.password.id_for_label }}"
-            autocomplete="current-password"
-            placeholder="Ingresa tu contraseña"
-            required
-        >
+        <div class="control-login">
+
+            <span class="icono-control-login">
+                🔒
+            </span>
+
+            <input
+                type="password"
+                name="password"
+                id="{{ form.password.id_for_label }}"
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password"
+                required
+            >
+
+        </div>
 
         {% if form.password.errors %}
-            <div class="error-campo">
+            <div class="error-login">
                 {{ form.password.errors }}
             </div>
         {% endif %}
@@ -86,10 +105,18 @@
         >
     {% endif %}
 
-    <button type="submit" class="boton-login">
+    <button type="submit" class="boton-ingresar">
         Iniciar sesión
+        <span aria-hidden="true">→</span>
     </button>
 
 </form>
+
+<div class="seguridad-login">
+    <span>🔐</span>
+    <p>
+        Acceso exclusivo para usuarios autorizados.
+    </p>
+</div>
 
 {% endblock %}

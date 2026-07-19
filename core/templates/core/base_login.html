@@ -10,6 +10,11 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="Sistema de gestión comercial y de proyectos de TG Technology"
+    >
+
     <title>
         {% block title %}
             TG Management
@@ -18,7 +23,7 @@
 
     <link
         rel="stylesheet"
-        href="{% static 'core/css/styles.css' %}"
+        href="{% static 'core/css/styles.css' %}?v=2"
     >
 </head>
 
@@ -26,30 +31,79 @@
 
     <main class="contenedor-login">
 
-        <section class="marca-login">
+        <section class="presentacion-login">
 
             <div class="logo-login">
                 TG
             </div>
 
-            <h1>TG Technology</h1>
+            <span class="nombre-sistema-login">
+                TG Management
+            </span>
+
+            <h1>
+                Gestiona tu negocio desde un solo lugar
+            </h1>
 
             <p>
-                Soluciones digitales para mejorar y hacer crecer tu negocio.
+                Clientes, cotizaciones, proyectos, finanzas,
+                soporte y satisfacción de clientes.
             </p>
 
+            <div class="beneficios-login">
+
+                <div class="beneficio-login">
+                    <span class="icono-beneficio">✓</span>
+
+                    <div>
+                        <strong>Control centralizado</strong>
+                        <small>
+                            Toda la información comercial y operativa
+                            en un mismo sistema.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="beneficio-login">
+                    <span class="icono-beneficio">✓</span>
+
+                    <div>
+                        <strong>Seguimiento de proyectos</strong>
+                        <small>
+                            Actividades, documentos y avances actualizados.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="beneficio-login">
+                    <span class="icono-beneficio">✓</span>
+
+                    <div>
+                        <strong>Decisiones con información</strong>
+                        <small>
+                            Indicadores claros para administrar el negocio.
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+
         </section>
 
-        <section class="tarjeta-login">
+        <section class="area-formulario-login">
 
-            {% block content %}
-            {% endblock %}
+            <div class="tarjeta-login">
+
+                {% block content %}
+                {% endblock %}
+
+            </div>
+
+            <footer class="pie-login">
+                © {% now "Y" %} TG Technology · Todos los derechos reservados
+            </footer>
 
         </section>
-
-        <footer class="pie-login">
-            © {% now "Y" %} TG Technology
-        </footer>
 
     </main>
 

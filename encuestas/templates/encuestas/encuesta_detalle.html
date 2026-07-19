@@ -1,69 +1,820 @@
 {% extends "core/base.html" %}
 {% load static %}
-{% block title %}Encuesta {{ encuesta.proyecto.codigo }} | TG Management{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'encuestas/css/encuestas.css' %}">{% endblock %}
-{% block content %}
-<div class="proyecto-header">
-    <div>
-        <div class="encabezado-codigo"><span class="codigo-registro">{{ encuesta.proyecto.codigo }}</span><span class="estado estado-{{ encuesta.estado }}">{{ encuesta.get_estado_display }}</span></div>
-        <h1>Encuesta de satisfacción</h1>
-        <p>{{ encuesta.proyecto.nombre }} · {{ encuesta.empresa }}</p>
-    </div>
-    <div class="header-actions"><a class="btn btn-secondary" href="{% url 'encuestas:lista' %}">Volver</a></div>
-</div>
 
-<div class="detalle-grid">
-    <section class="detalle-principal">
-        <div class="card-header"><div><h2>Información</h2><p>Datos de control y acceso público.</p></div></div>
-        <div class="detalle-datos-grid">
-            <div class="detalle-item"><span class="detalle-label">Cliente</span><strong>{{ encuesta.empresa }}</strong></div>
-            <div class="detalle-item"><span class="detalle-label">Contacto</span><strong>{{ encuesta.contacto|default:"—" }}</strong></div>
-            <div class="detalle-item"><span class="detalle-label">Fecha de envío</span><strong>{{ encuesta.fecha_envio|date:"d-m-Y H:i"|default:"—" }}</strong></div>
-            <div class="detalle-item"><span class="detalle-label">Vencimiento</span><strong>{{ encuesta.fecha_vencimiento|date:"d-m-Y"|default:"Sin vencimiento" }}</strong></div>
+{% block title %}
+    Encuesta {{ encuesta.proyecto.codigo }} | TG Management
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'encuestas/css/encuestas.css' %}?v=3"
+    >
+{% endblock %}
+
+{% block content %}
+
+<div class="encuesta-detalle">
+
+    <!-- =====================================================
+         ENCABEZADO
+    ====================================================== -->
+
+    <header class="encuesta-detalle__header">
+
+        <div class="encuesta-detalle__titulo">
+
+            <a
+                href="{% url 'encuestas:lista' %}"
+                class="encuesta-volver"
+            >
+                ← Volver a encuestas
+            </a>
+
+            <div class="encuesta-detalle__codigo">
+
+                <span>
+                    {{ encuesta.proyecto.codigo }}
+                </span>
+
+                <span
+                    class="
+                        encuesta-estado
+                        encuesta-estado--{{ encuesta.estado }}
+                    "
+                >
+                    {{ encuesta.get_estado_display }}
+                </span>
+
+            </div>
+
+            <h1>Encuesta de satisfacción</h1>
+
+            <p>
+                {{ encuesta.proyecto.nombre }}
+                <span>·</span>
+                {{ encuesta.empresa }}
+            </p>
+
         </div>
-        {% if not encuesta.respondida %}
-        <div class="detalle-bloque">
-            <span class="detalle-label">Enlace para el cliente</span>
-            <div class="enlace-publico"><input id="url-encuesta" class="form-control" value="{{ url_publica }}" readonly><button type="button" class="boton" onclick="copiarEncuesta()">Copiar enlace</button></div>
+
+        <div class="encuesta-detalle__meta">
+
+            <span>Creada</span>
+
+            <strong>
+                {{ encuesta.creado_en|date:"d-m-Y" }}
+            </strong>
+
+            {% if encuesta.creado_por %}
+                <small>
+                    Por {{ encuesta.creado_por.get_full_name|default:encuesta.creado_por.username }}
+                </small>
+            {% endif %}
+
         </div>
-        {% endif %}
+
+    </header>
+
+
+    <!-- =====================================================
+         RESUMEN DE ESTADO
+    ====================================================== -->
+
+    <section class="encuesta-resumen">
+
+        <article class="encuesta-resumen__item">
+
+            <div class="encuesta-resumen__icono">
+                👤
+            </div>
+
+            <div>
+                <span>Cliente</span>
+
+                <strong>
+                    {{ encuesta.empresa }}
+                </strong>
+            </div>
+
+        </article>
+
+        <article class="encuesta-resumen__item">
+
+            <div class="encuesta-resumen__icono">
+                📅
+            </div>
+
+            <div>
+                <span>Fecha de envío</span>
+
+                <strong>
+                    {{ encuesta.fecha_envio|date:"d-m-Y H:i"|default:"Pendiente de envío" }}
+                </strong>
+            </div>
+
+        </article>
+
+        <article class="encuesta-resumen__item">
+
+            <div class="encuesta-resumen__icono">
+                ⏳
+            </div>
+
+            <div>
+                <span>Vencimiento</span>
+
+                <strong>
+                    {{ encuesta.fecha_vencimiento|date:"d-m-Y"|default:"Sin vencimiento" }}
+                </strong>
+            </div>
+
+        </article>
+
+        <article class="encuesta-resumen__item">
+
+            <div class="encuesta-resumen__icono">
+                {% if encuesta.respondida %}
+                    ✓
+                {% else %}
+                    ◷
+                {% endif %}
+            </div>
+
+            <div>
+                <span>Respuesta</span>
+
+                <strong>
+                    {% if encuesta.respondida %}
+                        {{ encuesta.fecha_respuesta|date:"d-m-Y H:i" }}
+                    {% else %}
+                        Aún no respondida
+                    {% endif %}
+                </strong>
+            </div>
+
+        </article>
+
     </section>
 
-    <aside class="detalle-lateral">
-        <div class="card">
-            <h2>Acciones</h2>
-            {% if not encuesta.respondida and encuesta.estado != 'anulada' %}
-            <form method="post" action="{% url 'encuestas:marcar_enviada' encuesta.pk %}">{% csrf_token %}<button class="boton boton-exito boton-ancho" type="submit">Marcar como enviada</button></form>
-            <form method="post" action="{% url 'encuestas:anular' encuesta.pk %}" onsubmit="return confirm('¿Anular esta encuesta?');">{% csrf_token %}<button class="boton boton-peligro boton-ancho" type="submit">Anular encuesta</button></form>
-            {% else %}<p class="texto-secundario">No hay acciones pendientes.</p>{% endif %}
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
+
+    <div class="encuesta-detalle__grid">
+
+        <div class="encuesta-detalle__principal">
+
+            <!-- INFORMACIÓN -->
+
+            <section class="encuesta-card">
+
+                <div class="encuesta-card__header">
+
+                    <div>
+                        <span class="encuesta-card__eyebrow">
+                            Datos generales
+                        </span>
+
+                        <h2>Información de la encuesta</h2>
+
+                        <p>
+                            Datos del proyecto, contacto y control de la encuesta.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="encuesta-info-grid">
+
+                    <div class="encuesta-info">
+
+                        <span>Proyecto</span>
+
+                        <strong>
+                            {{ encuesta.proyecto.codigo }}
+                        </strong>
+
+                        <small>
+                            {{ encuesta.proyecto.nombre }}
+                        </small>
+
+                    </div>
+
+                    <div class="encuesta-info">
+
+                        <span>Cliente</span>
+
+                        <strong>
+                            {{ encuesta.empresa }}
+                        </strong>
+
+                    </div>
+
+                    <div class="encuesta-info">
+
+                        <span>Contacto</span>
+
+                        <strong>
+                            {{ encuesta.contacto|default:"Sin contacto asignado" }}
+                        </strong>
+
+                    </div>
+
+                    <div class="encuesta-info">
+
+                        <span>Estado actual</span>
+
+                        <strong>
+                            {{ encuesta.get_estado_display }}
+                        </strong>
+
+                    </div>
+
+                    <div class="encuesta-info">
+
+                        <span>Fecha de creación</span>
+
+                        <strong>
+                            {{ encuesta.creado_en|date:"d-m-Y H:i" }}
+                        </strong>
+
+                    </div>
+
+                    <div class="encuesta-info">
+
+                        <span>Última actualización</span>
+
+                        <strong>
+                            {{ encuesta.actualizado_en|date:"d-m-Y H:i" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ENLACE PÚBLICO -->
+
+            {% if not encuesta.respondida and encuesta.estado != "anulada" %}
+
+                <section class="encuesta-card">
+
+                    <div class="encuesta-card__header encuesta-card__header--horizontal">
+
+                        <div>
+                            <span class="encuesta-card__eyebrow">
+                                Acceso para el cliente
+                            </span>
+
+                            <h2>Enlace público</h2>
+
+                            <p>
+                                Comparte este enlace con el cliente para que pueda responder.
+                            </p>
+                        </div>
+
+                        <span class="encuesta-publica-badge">
+                            Sin inicio de sesión
+                        </span>
+
+                    </div>
+
+                    <div class="enlace-publico">
+
+                        <input
+                            type="text"
+                            id="urlEncuesta"
+                            value="{{ url_publica }}"
+                            readonly
+                            aria-label="Enlace público de la encuesta"
+                        >
+
+                        <button
+                            type="button"
+                            class="encuesta-btn encuesta-btn--copiar"
+                            id="botonCopiar"
+                            onclick="copiarEnlaceEncuesta()"
+                        >
+                            <span id="iconoCopiar">⧉</span>
+                            <span id="textoCopiar">Copiar enlace</span>
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="encuesta-copia-confirmacion"
+                        id="mensajeCopiado"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        Enlace copiado al portapapeles.
+                    </div>
+
+                    <div class="encuesta-ayuda">
+
+                        <span>ⓘ</span>
+
+                        <p>
+                            Cualquier persona que tenga este enlace podrá responder
+                            la encuesta mientras se encuentre vigente.
+                        </p>
+
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+
+            <!-- RESULTADOS -->
+
+            {% if encuesta.respondida %}
+
+                <section class="encuesta-card">
+
+                    <div class="encuesta-card__header">
+
+                        <div>
+                            <span class="encuesta-card__eyebrow">
+                                Evaluación recibida
+                            </span>
+
+                            <h2>Resultado de satisfacción</h2>
+
+                            <p>
+                                Respuesta registrada el
+                                {{ encuesta.fecha_respuesta|date:"d-m-Y H:i" }}.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="resultado-grid">
+
+                        <article class="resultado-kpi">
+
+                            <span>Satisfacción</span>
+
+                            <strong>
+                                {{ encuesta.satisfaccion_general }}
+                                <small>/ 5</small>
+                            </strong>
+
+                            <div class="resultado-barra">
+                                <span
+                                    style="width: {% widthratio encuesta.satisfaccion_general 5 100 %}%"
+                                ></span>
+                            </div>
+
+                        </article>
+
+                        <article class="resultado-kpi">
+
+                            <span>Calidad</span>
+
+                            <strong>
+                                {{ encuesta.calidad_solucion }}
+                                <small>/ 5</small>
+                            </strong>
+
+                            <div class="resultado-barra">
+                                <span
+                                    style="width: {% widthratio encuesta.calidad_solucion 5 100 %}%"
+                                ></span>
+                            </div>
+
+                        </article>
+
+                        <article class="resultado-kpi">
+
+                            <span>Comunicación</span>
+
+                            <strong>
+                                {{ encuesta.comunicacion }}
+                                <small>/ 5</small>
+                            </strong>
+
+                            <div class="resultado-barra">
+                                <span
+                                    style="width: {% widthratio encuesta.comunicacion 5 100 %}%"
+                                ></span>
+                            </div>
+
+                        </article>
+
+                        <article class="resultado-kpi">
+
+                            <span>Cumplimiento de plazos</span>
+
+                            <strong>
+                                {{ encuesta.cumplimiento_plazos }}
+                                <small>/ 5</small>
+                            </strong>
+
+                            <div class="resultado-barra">
+                                <span
+                                    style="width: {% widthratio encuesta.cumplimiento_plazos 5 100 %}%"
+                                ></span>
+                            </div>
+
+                        </article>
+
+                    </div>
+
+
+                    <div class="encuesta-resultado-destacado">
+
+                        <div>
+
+                            <span>Promedio general</span>
+
+                            <strong>
+                                {{ encuesta.promedio_satisfaccion|default:"—" }}
+                                <small>/ 5</small>
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <span>Recomendación NPS</span>
+
+                            <strong>
+                                {{ encuesta.recomendacion }}
+                                <small>/ 10</small>
+                            </strong>
+
+                            <span
+                                class="
+                                    encuesta-nps
+                                    {% if encuesta.categoria_nps == 'Promotor' %}
+                                        encuesta-nps--promotor
+                                    {% elif encuesta.categoria_nps == 'Pasivo' %}
+                                        encuesta-nps--pasivo
+                                    {% else %}
+                                        encuesta-nps--detractor
+                                    {% endif %}
+                                "
+                            >
+                                {{ encuesta.categoria_nps }}
+                            </span>
+
+                        </div>
+
+                        <div>
+
+                            <span>Cumplimiento de expectativas</span>
+
+                            <strong class="encuesta-expectativa">
+                                {{ encuesta.get_cumplimiento_expectativas_display|default:"—" }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- COMENTARIOS -->
+
+                <section class="encuesta-card">
+
+                    <div class="encuesta-card__header">
+
+                        <div>
+                            <span class="encuesta-card__eyebrow">
+                                Comentarios del cliente
+                            </span>
+
+                            <h2>Retroalimentación</h2>
+                        </div>
+
+                    </div>
+
+                    <div class="encuesta-comentarios">
+
+                        <article class="encuesta-comentario">
+
+                            <span>Aspectos más valorados</span>
+
+                            <p>
+                                {{ encuesta.aspectos_valorados|default:"El cliente no agregó comentarios."|linebreaksbr }}
+                            </p>
+
+                        </article>
+
+                        <article class="encuesta-comentario">
+
+                            <span>Aspectos por mejorar</span>
+
+                            <p>
+                                {{ encuesta.aspectos_mejora|default:"El cliente no agregó comentarios."|linebreaksbr }}
+                            </p>
+
+                        </article>
+
+                        <article class="encuesta-comentario encuesta-comentario--completo">
+
+                            <div class="encuesta-comentario__titulo">
+
+                                <span>Testimonio</span>
+
+                                {% if encuesta.autoriza_testimonio %}
+
+                                    <span class="testimonio-estado testimonio-estado--autorizado">
+                                        ✓ Autorizado para publicación
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="testimonio-estado testimonio-estado--no-autorizado">
+                                        No autorizado para publicación
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            <p>
+                                {{ encuesta.testimonio|default:"El cliente no agregó un testimonio."|linebreaksbr }}
+                            </p>
+
+                        </article>
+
+                    </div>
+
+                </section>
+
+            {% endif %}
+
         </div>
-    </aside>
+
+
+        <!-- =================================================
+             PANEL LATERAL
+        ================================================== -->
+
+        <aside class="encuesta-detalle__lateral">
+
+            <section class="encuesta-card encuesta-card--acciones">
+
+                <div class="encuesta-card__header">
+
+                    <div>
+                        <span class="encuesta-card__eyebrow">
+                            Gestión
+                        </span>
+
+                        <h2>Acciones</h2>
+                    </div>
+
+                </div>
+
+                {% if not encuesta.respondida and encuesta.estado != "anulada" %}
+
+                    <div class="encuesta-acciones">
+
+                        {% if encuesta.estado == "pendiente" %}
+
+                            <form
+                                method="post"
+                                action="{% url 'encuestas:marcar_enviada' encuesta.pk %}"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="encuesta-btn encuesta-btn--principal"
+                                >
+                                    <span>✉</span>
+                                    Marcar como enviada
+                                </button>
+
+                            </form>
+
+                            <p class="encuesta-accion-ayuda">
+                                Utiliza esta opción después de compartir el enlace
+                                con el cliente.
+                            </p>
+
+                        {% elif encuesta.estado == "enviada" %}
+
+                            <div class="encuesta-estado-enviada">
+
+                                <span>✓</span>
+
+                                <div>
+                                    <strong>Encuesta enviada</strong>
+
+                                    <small>
+                                        Marcada como enviada el
+                                        {{ encuesta.fecha_envio|date:"d-m-Y H:i" }}.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                        <div class="encuesta-separador"></div>
+
+                        <form
+                            method="post"
+                            action="{% url 'encuestas:anular' encuesta.pk %}"
+                            onsubmit="return confirmarAnulacion();"
+                        >
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="encuesta-btn encuesta-btn--peligro"
+                            >
+                                <span>×</span>
+                                Anular encuesta
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% elif encuesta.respondida %}
+
+                    <div class="encuesta-accion-finalizada">
+
+                        <div class="encuesta-accion-finalizada__icono">
+                            ✓
+                        </div>
+
+                        <strong>Encuesta respondida</strong>
+
+                        <p>
+                            El cliente completó correctamente esta evaluación.
+                        </p>
+
+                    </div>
+
+                {% elif encuesta.estado == "anulada" %}
+
+                    <div class="encuesta-accion-anulada">
+
+                        <div class="encuesta-accion-anulada__icono">
+                            ×
+                        </div>
+
+                        <strong>Encuesta anulada</strong>
+
+                        <p>
+                            El enlace público ya no está disponible.
+                        </p>
+
+                    </div>
+
+                {% else %}
+
+                    <p class="encuesta-sin-acciones">
+                        No hay acciones disponibles.
+                    </p>
+
+                {% endif %}
+
+            </section>
+
+
+            <section class="encuesta-card encuesta-card--estado">
+
+                <span class="encuesta-card__eyebrow">
+                    Estado del proceso
+                </span>
+
+                <div class="encuesta-timeline">
+
+                    <div class="encuesta-timeline__item encuesta-timeline__item--completo">
+
+                        <span class="encuesta-timeline__punto">✓</span>
+
+                        <div>
+                            <strong>Encuesta creada</strong>
+
+                            <small>
+                                {{ encuesta.creado_en|date:"d-m-Y H:i" }}
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="
+                            encuesta-timeline__item
+                            {% if encuesta.fecha_envio %}
+                                encuesta-timeline__item--completo
+                            {% endif %}
+                        "
+                    >
+
+                        <span class="encuesta-timeline__punto">
+                            {% if encuesta.fecha_envio %}✓{% else %}2{% endif %}
+                        </span>
+
+                        <div>
+                            <strong>Encuesta enviada</strong>
+
+                            <small>
+                                {% if encuesta.fecha_envio %}
+                                    {{ encuesta.fecha_envio|date:"d-m-Y H:i" }}
+                                {% else %}
+                                    Pendiente
+                                {% endif %}
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="
+                            encuesta-timeline__item
+                            {% if encuesta.respondida %}
+                                encuesta-timeline__item--completo
+                            {% endif %}
+                        "
+                    >
+
+                        <span class="encuesta-timeline__punto">
+                            {% if encuesta.respondida %}✓{% else %}3{% endif %}
+                        </span>
+
+                        <div>
+                            <strong>Respuesta recibida</strong>
+
+                            <small>
+                                {% if encuesta.respondida %}
+                                    {{ encuesta.fecha_respuesta|date:"d-m-Y H:i" }}
+                                {% else %}
+                                    Pendiente
+                                {% endif %}
+                            </small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
 </div>
 
-{% if encuesta.respondida %}
-<div class="panel">
-    <h2>Resultado de la evaluación</h2>
-    <div class="resultado-grid">
-        <div class="resultado-kpi"><span>Satisfacción</span><strong>{{ encuesta.satisfaccion_general }}/5</strong></div>
-        <div class="resultado-kpi"><span>Calidad</span><strong>{{ encuesta.calidad_solucion }}/5</strong></div>
-        <div class="resultado-kpi"><span>Comunicación</span><strong>{{ encuesta.comunicacion }}/5</strong></div>
-        <div class="resultado-kpi"><span>Plazos</span><strong>{{ encuesta.cumplimiento_plazos }}/5</strong></div>
-        <div class="resultado-kpi"><span>Recomendación</span><strong>{{ encuesta.recomendacion }}/10</strong><small>{{ encuesta.categoria_nps }}</small></div>
-    </div>
-    <div class="detalle-datos-grid resultados-texto">
-        <div class="detalle-item"><span class="detalle-label">Cumplimiento de expectativas</span><strong>{{ encuesta.get_cumplimiento_expectativas_display }}</strong></div>
-        <div class="detalle-item"><span class="detalle-label">Aspectos valorados</span><p>{{ encuesta.aspectos_valorados|default:"—"|linebreaksbr }}</p></div>
-        <div class="detalle-item"><span class="detalle-label">Aspectos por mejorar</span><p>{{ encuesta.aspectos_mejora|default:"—"|linebreaksbr }}</p></div>
-        <div class="detalle-item"><span class="detalle-label">Testimonio</span><p>{{ encuesta.testimonio|default:"—"|linebreaksbr }}</p><small>{% if encuesta.autoriza_testimonio %}Autorizado para publicación{% else %}No autorizado para publicación{% endif %}</small></div>
-    </div>
-</div>
-{% endif %}
 {% endblock %}
+
+
 {% block extra_js %}
+
 <script>
-function copiarEncuesta() {
-    const campo = document.getElementById("url-encuesta");
-    navigator.clipboard.writeText(campo.value).then(() => alert("Enlace copiado."));
-}
+    async function copiarEnlaceEncuesta() {
+        const input = document.getElementById("urlEncuesta");
+        const mensaje = document.getElementById("mensajeCopiado");
+        const textoBoton = document.getElementById("textoCopiar");
+        const iconoBoton = document.getElementById("iconoCopiar");
+
+        if (!input) {
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(input.value);
+        } catch (error) {
+            input.select();
+            input.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            window.getSelection().removeAllRanges();
+        }
+
+        mensaje.classList.add("encuesta-copia-confirmacion--visible");
+        textoBoton.textContent = "Copiado";
+        iconoBoton.textContent = "✓";
+
+        window.setTimeout(() => {
+            mensaje.classList.remove(
+                "encuesta-copia-confirmacion--visible"
+            );
+            textoBoton.textContent = "Copiar enlace";
+            iconoBoton.textContent = "⧉";
+        }, 2500);
+    }
+
+    function confirmarAnulacion() {
+        return window.confirm(
+            "¿Estás segura de que deseas anular esta encuesta? " +
+            "El cliente ya no podrá responder mediante el enlace público."
+        );
+    }
 </script>
+
 {% endblock %}

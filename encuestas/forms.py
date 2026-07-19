@@ -96,21 +96,51 @@ class EncuestaRespuestaForm(forms.ModelForm):
             "testimonio",
             "autoriza_testimonio",
         ]
-        widgets = {
-            "cumplimiento_expectativas": forms.RadioSelect,
-            "aspectos_valorados": forms.Textarea(
-                attrs={"class": "form-control", "rows": 4}
-            ),
-            "aspectos_mejora": forms.Textarea(
-                attrs={"class": "form-control", "rows": 4}
-            ),
-            "testimonio": forms.Textarea(
-                attrs={"class": "form-control", "rows": 4}
-            ),
-            "autoriza_testimonio": forms.CheckboxInput(
-                attrs={"class": "form-check"}
-            ),
-        }
+    widgets = {
+        "cumplimiento_expectativas": forms.RadioSelect,
+
+        "aspectos_valorados": forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "maxlength": 1000,
+                "placeholder": (
+                    "Ej.: La comunicación fue clara, el proceso estuvo "
+                    "bien organizado y la solución fue fácil de utilizar."
+                ),
+            }
+        ),
+
+        "aspectos_mejora": forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "maxlength": 1000,
+                "placeholder": (
+                    "Ej.: Me habría gustado recibir más información "
+                    "durante algunas etapas del proyecto."
+                ),
+            }
+        ),
+
+        "testimonio": forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "maxlength": 1000,
+                "placeholder": (
+                    "Ej.: TG Technology comprendió nuestras necesidades "
+                    "y entregó una solución profesional y fácil de usar."
+                ),
+            }
+        ),
+
+        "autoriza_testimonio": forms.CheckboxInput(
+            attrs={
+                "class": "form-check",
+            }
+        ),
+    }
 
     def clean(self):
         cleaned_data = super().clean()

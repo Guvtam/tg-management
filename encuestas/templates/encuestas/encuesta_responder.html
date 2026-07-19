@@ -1,37 +1,1134 @@
 {% load static %}
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Encuesta de satisfacción | TG Technology</title>
-    <link rel="stylesheet" href="{% static 'encuestas/css/encuestas.css' %}">
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Encuesta de satisfacción de TG Technology"
+    >
+
+    <title>
+        Encuesta de satisfacción | TG Technology
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'encuestas/css/encuestas.css' %}?v=6"
+    >
 </head>
+
 <body class="encuesta-publica-body">
-<main class="encuesta-publica">
-    <header class="encuesta-publica-header">
-        <span class="encuesta-marca">TG Technology</span>
-        <h1>Queremos conocer tu experiencia</h1>
-        <p>Tu opinión nos ayuda a mejorar continuamente nuestros servicios.</p>
-        <div class="encuesta-proyecto"><strong>{{ encuesta.proyecto.nombre }}</strong><span>{{ encuesta.empresa }}</span></div>
+
+    <!-- =====================================================
+         BARRA SUPERIOR
+    ====================================================== -->
+
+    <header class="survey-topbar">
+
+        <div class="survey-topbar__contenido">
+
+            <div class="survey-marca">
+
+                <div class="survey-logo">
+                    TG
+                </div>
+
+                <div class="survey-marca__texto">
+                    <strong>
+                        TG <span>Technology</span>
+                    </strong>
+
+                    <small>
+                        Soluciones digitales
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="survey-seguridad">
+                <span>🔒</span>
+                Encuesta segura
+            </div>
+
+        </div>
+
     </header>
-    <form method="post" class="encuesta-publica-form" novalidate>
-        {% csrf_token %}
-        {% if form.non_field_errors %}<div class="mensaje-error">{{ form.non_field_errors }}</div>{% endif %}
-        {% for field in form %}
-        <section class="pregunta">
-            <label class="pregunta-label">{{ forloop.counter }}. {{ field.label }}{% if field.field.required %} *{% endif %}</label>
-            {% if field.name == 'satisfaccion_general' or field.name == 'calidad_solucion' or field.name == 'comunicacion' or field.name == 'cumplimiento_plazos' or field.name == 'recomendacion' or field.name == 'cumplimiento_expectativas' %}
-                <div class="opciones-escala">{{ field }}</div>
-            {% elif field.name == 'autoriza_testimonio' %}
-                <div class="autorizacion">{{ field }} <label for="{{ field.id_for_label }}">Sí, autorizo el uso de mi testimonio en material comercial de TG Technology.</label></div>
-            {% else %}{{ field }}{% endif %}
-            {% for error in field.errors %}<div class="error-campo">{{ error }}</div>{% endfor %}
+
+
+    <!-- =====================================================
+         PROGRESO
+    ====================================================== -->
+
+    <div class="survey-progress">
+
+        <div
+            class="survey-progress__barra"
+            id="barraProgreso"
+        ></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
+
+    <main class="survey-layout">
+
+        <!-- =================================================
+             PRESENTACIÓN
+        ================================================== -->
+
+        <section class="survey-hero">
+
+            <span class="survey-etiqueta">
+                Encuesta de satisfacción
+            </span>
+
+            <h1>
+                Queremos conocer tu experiencia
+            </h1>
+
+            <p>
+                Tu opinión nos ayuda a mejorar continuamente
+                la calidad de nuestros servicios.
+            </p>
+
+            <div class="survey-proyecto-card">
+
+                <div class="survey-proyecto-card__icono">
+                    ✦
+                </div>
+
+                <div>
+                    <span>Proyecto evaluado</span>
+
+                    <strong>
+                        {{ encuesta.proyecto.nombre }}
+                    </strong>
+
+                    <small>
+                        {{ encuesta.empresa }}
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="survey-meta">
+
+                <span>
+                    ⏱ Tiempo estimado: 2 minutos
+                </span>
+
+                <span>
+                    Tus respuestas serán tratadas de forma confidencial.
+                </span>
+
+            </div>
+
         </section>
-        {% endfor %}
-        <button class="boton-publico" type="submit">Enviar evaluación</button>
-        <p class="privacidad">La información será utilizada únicamente para evaluar y mejorar el servicio.</p>
-    </form>
-</main>
+
+
+        <!-- =================================================
+             FORMULARIO
+        ================================================== -->
+
+        <form
+            method="post"
+            class="survey-form"
+            id="formEncuesta"
+            novalidate
+        >
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+
+                <div class="survey-error-general">
+
+                    <strong>
+                        No fue posible enviar la encuesta.
+                    </strong>
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =============================================
+                 SECCIÓN 1
+            ============================================== -->
+
+            <section class="survey-seccion">
+
+                <div class="survey-seccion__encabezado">
+
+                    <div class="survey-seccion__numero">
+                        1
+                    </div>
+
+                    <div>
+                        <span>Experiencia general</span>
+
+                        <h2>
+                            Cuéntanos cómo fue trabajar con nosotros
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <!-- SATISFACCIÓN GENERAL -->
+
+                <article class="survey-pregunta">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                01
+                            </span>
+
+                            <label class="survey-pregunta__titulo">
+                                {{ form.satisfaccion_general.label }}
+                                <span class="survey-requerido">*</span>
+                            </label>
+                        </div>
+
+                        <span class="survey-pregunta__ayuda">
+                            Selecciona de 1 a 5 estrellas
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="survey-estrellas"
+                        data-rating-field
+                    >
+
+                        {% for choice in form.satisfaccion_general %}
+
+                            <div class="survey-estrella-opcion">
+
+                                {{ choice.tag }}
+
+                                <label
+                                    for="{{ choice.id_for_label }}"
+                                    title="{{ choice.choice_label }} de 5"
+                                >
+                                    <span class="survey-estrella">★</span>
+
+                                    <small>
+                                        {{ choice.choice_label }}
+                                    </small>
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="survey-rating-texto">
+
+                        <span>Muy insatisfecho</span>
+                        <span>Excelente</span>
+
+                    </div>
+
+                    {% for error in form.satisfaccion_general.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+
+                <!-- CALIDAD -->
+
+                <article class="survey-pregunta">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                02
+                            </span>
+
+                            <label class="survey-pregunta__titulo">
+                                {{ form.calidad_solucion.label }}
+                                <span class="survey-requerido">*</span>
+                            </label>
+                        </div>
+
+                        <span class="survey-pregunta__ayuda">
+                            Evalúa el resultado entregado
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="survey-estrellas"
+                        data-rating-field
+                    >
+
+                        {% for choice in form.calidad_solucion %}
+
+                            <div class="survey-estrella-opcion">
+
+                                {{ choice.tag }}
+
+                                <label
+                                    for="{{ choice.id_for_label }}"
+                                    title="{{ choice.choice_label }} de 5"
+                                >
+                                    <span class="survey-estrella">★</span>
+
+                                    <small>
+                                        {{ choice.choice_label }}
+                                    </small>
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="survey-rating-texto">
+
+                        <span>Muy baja</span>
+                        <span>Excelente</span>
+
+                    </div>
+
+                    {% for error in form.calidad_solucion.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+
+                <!-- COMUNICACIÓN -->
+
+                <article class="survey-pregunta">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                03
+                            </span>
+
+                            <label class="survey-pregunta__titulo">
+                                {{ form.comunicacion.label }}
+                                <span class="survey-requerido">*</span>
+                            </label>
+                        </div>
+
+                        <span class="survey-pregunta__ayuda">
+                            Considera claridad y acompañamiento
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="survey-estrellas"
+                        data-rating-field
+                    >
+
+                        {% for choice in form.comunicacion %}
+
+                            <div class="survey-estrella-opcion">
+
+                                {{ choice.tag }}
+
+                                <label
+                                    for="{{ choice.id_for_label }}"
+                                    title="{{ choice.choice_label }} de 5"
+                                >
+                                    <span class="survey-estrella">★</span>
+
+                                    <small>
+                                        {{ choice.choice_label }}
+                                    </small>
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="survey-rating-texto">
+
+                        <span>Muy deficiente</span>
+                        <span>Excelente</span>
+
+                    </div>
+
+                    {% for error in form.comunicacion.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+
+                <!-- PLAZOS -->
+
+                <article class="survey-pregunta">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                04
+                            </span>
+
+                            <label class="survey-pregunta__titulo">
+                                {{ form.cumplimiento_plazos.label }}
+                                <span class="survey-requerido">*</span>
+                            </label>
+                        </div>
+
+                        <span class="survey-pregunta__ayuda">
+                            Considera las fechas acordadas
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="survey-estrellas"
+                        data-rating-field
+                    >
+
+                        {% for choice in form.cumplimiento_plazos %}
+
+                            <div class="survey-estrella-opcion">
+
+                                {{ choice.tag }}
+
+                                <label
+                                    for="{{ choice.id_for_label }}"
+                                    title="{{ choice.choice_label }} de 5"
+                                >
+                                    <span class="survey-estrella">★</span>
+
+                                    <small>
+                                        {{ choice.choice_label }}
+                                    </small>
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="survey-rating-texto">
+
+                        <span>No se cumplieron</span>
+                        <span>Se cumplieron totalmente</span>
+
+                    </div>
+
+                    {% for error in form.cumplimiento_plazos.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+            </section>
+
+
+            <!-- =============================================
+                 SECCIÓN 2
+            ============================================== -->
+
+            <section class="survey-seccion">
+
+                <div class="survey-seccion__encabezado">
+
+                    <div class="survey-seccion__numero">
+                        2
+                    </div>
+
+                    <div>
+                        <span>Resultado del proyecto</span>
+
+                        <h2>
+                            Evalúa el cumplimiento de tus expectativas
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <!-- EXPECTATIVAS -->
+
+                <article class="survey-pregunta">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                05
+                            </span>
+
+                            <label class="survey-pregunta__titulo">
+                                {{ form.cumplimiento_expectativas.label }}
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <div class="survey-expectativas">
+
+                        {% for choice in form.cumplimiento_expectativas %}
+
+                            <div class="survey-expectativa-opcion">
+
+                                {{ choice.tag }}
+
+                                <label for="{{ choice.id_for_label }}">
+
+                                    {% if choice.choice_label == "Sí, completamente" %}
+
+                                        <span class="survey-expectativa-opcion__icono">
+                                            ✓
+                                        </span>
+
+                                        <strong>
+                                            Sí, completamente
+                                        </strong>
+
+                                        <small>
+                                            El resultado cumplió plenamente
+                                            con lo esperado.
+                                        </small>
+
+                                    {% elif choice.choice_label == "Parcialmente" %}
+
+                                        <span class="survey-expectativa-opcion__icono">
+                                            ◐
+                                        </span>
+
+                                        <strong>
+                                            Parcialmente
+                                        </strong>
+
+                                        <small>
+                                            El resultado cumplió solo una
+                                            parte de lo esperado.
+                                        </small>
+
+                                    {% else %}
+
+                                        <span class="survey-expectativa-opcion__icono">
+                                            ×
+                                        </span>
+
+                                        <strong>
+                                            No
+                                        </strong>
+
+                                        <small>
+                                            El resultado no cumplió con
+                                            las expectativas.
+                                        </small>
+
+                                    {% endif %}
+
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% for error in form.cumplimiento_expectativas.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+
+                <!-- NPS -->
+
+                <article class="survey-pregunta">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                06
+                            </span>
+
+                            <label class="survey-pregunta__titulo">
+                                {{ form.recomendacion.label }}
+                                <span class="survey-requerido">*</span>
+                            </label>
+                        </div>
+
+                        <span class="survey-pregunta__ayuda">
+                            0 significa nada probable y 10 muy probable
+                        </span>
+
+                    </div>
+
+                    <div class="survey-nps">
+
+                        {% for choice in form.recomendacion %}
+
+                            <div class="survey-nps__opcion">
+
+                                {{ choice.tag }}
+
+                                <label for="{{ choice.id_for_label }}">
+                                    {{ choice.choice_label }}
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="survey-nps__texto">
+
+                        <span>
+                            Nada probable
+                        </span>
+
+                        <span>
+                            Muy probable
+                        </span>
+
+                    </div>
+
+                    {% for error in form.recomendacion.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+            </section>
+
+
+            <!-- =============================================
+                 SECCIÓN 3
+            ============================================== -->
+
+            <section class="survey-seccion">
+
+                <div class="survey-seccion__encabezado">
+
+                    <div class="survey-seccion__numero">
+                        3
+                    </div>
+
+                    <div>
+                        <span>Comentarios</span>
+
+                        <h2>
+                            Ayúdanos a seguir mejorando
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <!-- ASPECTOS VALORADOS -->
+
+                <article class="survey-pregunta survey-pregunta--texto">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                07
+                            </span>
+
+                            <label
+                                for="{{ form.aspectos_valorados.id_for_label }}"
+                                class="survey-pregunta__titulo"
+                            >
+                                {{ form.aspectos_valorados.label }}
+                            </label>
+                        </div>
+
+                        <span class="survey-opcional">
+                            Opcional
+                        </span>
+
+                    </div>
+
+                    <p class="survey-pregunta__descripcion">
+                        Cuéntanos qué parte del servicio, atención o solución
+                        fue la que más valoraste.
+                    </p>
+
+                    <div class="survey-textarea">
+                        {{ form.aspectos_valorados }}
+
+                        <span class="survey-textarea__contador">
+                            <span data-counter="id_aspectos_valorados">0</span>
+                            caracteres
+                        </span>
+                    </div>
+
+                    {% for error in form.aspectos_valorados.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+
+                <!-- ASPECTOS DE MEJORA -->
+
+                <article class="survey-pregunta survey-pregunta--texto">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                08
+                            </span>
+
+                            <label
+                                for="{{ form.aspectos_mejora.id_for_label }}"
+                                class="survey-pregunta__titulo"
+                            >
+                                {{ form.aspectos_mejora.label }}
+                            </label>
+                        </div>
+
+                        <span class="survey-opcional">
+                            Opcional
+                        </span>
+
+                    </div>
+
+                    <p class="survey-pregunta__descripcion">
+                        Indícanos qué podríamos hacer mejor en futuros
+                        proyectos o servicios.
+                    </p>
+
+                    <div class="survey-textarea">
+                        {{ form.aspectos_mejora }}
+
+                        <span class="survey-textarea__contador">
+                            <span data-counter="id_aspectos_mejora">0</span>
+                            caracteres
+                        </span>
+                    </div>
+
+                    {% for error in form.aspectos_mejora.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+
+                <!-- TESTIMONIO -->
+
+                <article class="survey-pregunta survey-pregunta--texto">
+
+                    <div class="survey-pregunta__cabecera">
+
+                        <div>
+                            <span class="survey-pregunta__numero">
+                                09
+                            </span>
+
+                            <label
+                                for="{{ form.testimonio.id_for_label }}"
+                                class="survey-pregunta__titulo"
+                            >
+                                ¿Te gustaría dejarnos un testimonio?
+                            </label>
+                        </div>
+
+                        <span class="survey-opcional">
+                            Opcional
+                        </span>
+
+                    </div>
+
+                    <p class="survey-pregunta__descripcion">
+                        Puedes compartir brevemente tu experiencia trabajando
+                        con TG Technology.
+                    </p>
+
+                    <div class="survey-textarea">
+                        {{ form.testimonio }}
+
+                        <span class="survey-textarea__contador">
+                            <span data-counter="id_testimonio">0</span>
+                            caracteres
+                        </span>
+                    </div>
+
+                    {% for error in form.testimonio.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+
+                    <div class="survey-autorizacion">
+
+                        {{ form.autoriza_testimonio }}
+
+                        <label
+                            for="{{ form.autoriza_testimonio.id_for_label }}"
+                        >
+                            <span class="survey-checkbox-visual">
+                                ✓
+                            </span>
+
+                            <span>
+                                <strong>
+                                    Autorizo el uso de mi testimonio
+                                </strong>
+
+                                <small>
+                                    TG Technology podrá utilizar este
+                                    comentario en material comercial,
+                                    sitio web o redes sociales.
+                                </small>
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                    {% for error in form.autoriza_testimonio.errors %}
+
+                        <div class="survey-error-campo">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </article>
+
+            </section>
+
+
+            <!-- =============================================
+                 ENVÍO
+            ============================================== -->
+
+            <section class="survey-envio">
+
+                <div class="survey-envio__seguridad">
+
+                    <span class="survey-envio__icono">
+                        🔒
+                    </span>
+
+                    <div>
+                        <strong>
+                            Tus respuestas están protegidas
+                        </strong>
+
+                        <p>
+                            La información será utilizada únicamente para
+                            evaluar y mejorar nuestros servicios.
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="survey-submit"
+                    id="botonEnviar"
+                >
+                    <span id="textoEnviar">
+                        Enviar evaluación
+                    </span>
+
+                    <span
+                        class="survey-submit__flecha"
+                        id="iconoEnviar"
+                    >
+                        →
+                    </span>
+                </button>
+
+                <p class="survey-envio__nota">
+                    Al enviar, tus respuestas quedarán registradas
+                    y no podrán ser modificadas.
+                </p>
+
+            </section>
+
+        </form>
+
+    </main>
+
+
+    <!-- =====================================================
+         PIE
+    ====================================================== -->
+
+    <footer class="survey-footer">
+
+        <strong>
+            TG <span>Technology</span>
+        </strong>
+
+        <p>
+            Creamos tecnología para hacer crecer tu empresa.
+        </p>
+
+        <small>
+            © {% now "Y" %} TG Technology · Chile
+        </small>
+
+    </footer>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            inicializarEstrellas();
+            inicializarContadores();
+            inicializarProgreso();
+            inicializarEnvio();
+        });
+
+
+        function inicializarEstrellas() {
+            const grupos = document.querySelectorAll(
+                "[data-rating-field]"
+            );
+
+            grupos.forEach((grupo) => {
+                const opciones = Array.from(
+                    grupo.querySelectorAll(
+                        ".survey-estrella-opcion"
+                    )
+                );
+
+                function actualizarEstrellas(valorSeleccionado) {
+                    opciones.forEach((opcion) => {
+                        const input = opcion.querySelector("input");
+                        const valor = Number(input.value);
+
+                        opcion.classList.toggle(
+                            "survey-estrella-opcion--activa",
+                            valor <= valorSeleccionado
+                        );
+                    });
+                }
+
+                opciones.forEach((opcion) => {
+                    const input = opcion.querySelector("input");
+                    const label = opcion.querySelector("label");
+                    const valor = Number(input.value);
+
+                    label.addEventListener("mouseenter", () => {
+                        actualizarEstrellas(valor);
+                    });
+
+                    input.addEventListener("change", () => {
+                        actualizarEstrellas(valor);
+                        actualizarProgreso();
+                    });
+                });
+
+                grupo.addEventListener("mouseleave", () => {
+                    const seleccionado = grupo.querySelector(
+                        "input:checked"
+                    );
+
+                    actualizarEstrellas(
+                        seleccionado
+                            ? Number(seleccionado.value)
+                            : 0
+                    );
+                });
+
+                const seleccionadoInicial = grupo.querySelector(
+                    "input:checked"
+                );
+
+                if (seleccionadoInicial) {
+                    actualizarEstrellas(
+                        Number(seleccionadoInicial.value)
+                    );
+                }
+            });
+        }
+
+
+        function inicializarContadores() {
+            const contadores = document.querySelectorAll(
+                "[data-counter]"
+            );
+
+            contadores.forEach((contador) => {
+                const campoId = contador.dataset.counter;
+                const campo = document.getElementById(campoId);
+
+                if (!campo) {
+                    return;
+                }
+
+                const actualizar = () => {
+                    contador.textContent = campo.value.length;
+                };
+
+                campo.addEventListener("input", actualizar);
+                actualizar();
+            });
+        }
+
+
+        function inicializarProgreso() {
+            const formulario = document.getElementById(
+                "formEncuesta"
+            );
+
+            if (!formulario) {
+                return;
+            }
+
+            formulario.addEventListener(
+                "change",
+                actualizarProgreso
+            );
+
+            formulario.addEventListener(
+                "input",
+                actualizarProgreso
+            );
+
+            actualizarProgreso();
+        }
+
+
+        function actualizarProgreso() {
+            const gruposObligatorios = [
+                "satisfaccion_general",
+                "calidad_solucion",
+                "comunicacion",
+                "cumplimiento_plazos",
+                "recomendacion",
+            ];
+
+            let respondidos = 0;
+
+            gruposObligatorios.forEach((nombre) => {
+                const seleccionado = document.querySelector(
+                    `input[name="${nombre}"]:checked`
+                );
+
+                if (seleccionado) {
+                    respondidos += 1;
+                }
+            });
+
+            const expectativas = document.querySelector(
+                'input[name="cumplimiento_expectativas"]:checked'
+            );
+
+            if (expectativas) {
+                respondidos += 1;
+            }
+
+            const total = gruposObligatorios.length + 1;
+            const porcentaje = Math.round(
+                (respondidos / total) * 100
+            );
+
+            const barra = document.getElementById(
+                "barraProgreso"
+            );
+
+            if (barra) {
+                barra.style.width = `${porcentaje}%`;
+            }
+        }
+
+
+        function inicializarEnvio() {
+            const formulario = document.getElementById(
+                "formEncuesta"
+            );
+
+            const boton = document.getElementById(
+                "botonEnviar"
+            );
+
+            const texto = document.getElementById(
+                "textoEnviar"
+            );
+
+            const icono = document.getElementById(
+                "iconoEnviar"
+            );
+
+            if (!formulario || !boton) {
+                return;
+            }
+
+            formulario.addEventListener("submit", () => {
+                boton.disabled = true;
+                boton.classList.add(
+                    "survey-submit--cargando"
+                );
+
+                texto.textContent = "Enviando evaluación";
+                icono.textContent = "···";
+            });
+        }
+    </script>
+
 </body>
 </html>

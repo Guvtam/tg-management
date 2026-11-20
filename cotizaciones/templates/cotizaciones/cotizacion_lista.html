@@ -141,12 +141,9 @@
                                     <form method="post" action="{% url 'cotizaciones:cotizacion_cambiar_estado' cotizacion.pk %}" style="display:flex;align-items:center;gap:6px;">
                                         {% csrf_token %}
                                         <select name="estado" aria-label="Estado de {{ cotizacion.numero }}" style="min-width:110px;padding:6px;border:1px solid #dce3ed;border-radius:8px;">
+                                            <option value="{{ cotizacion.estado }}" selected>{{ cotizacion.get_estado_display }}</option>
                                             {% for valor, etiqueta in estados %}
-                                            {% if cotizacion.estado == valor %}
-                                            <option value="{{ valor }}" selected="selected">{{ etiqueta }}</option>
-                                            {% else %}
                                             <option value="{{ valor }}">{{ etiqueta }}</option>
-                                            {% endif %}
                                             {% endfor %}
                                         </select>
                                         <button type="submit" class="boton boton-secundario" style="padding:6px 9px;font-size:12px;">Guardar</button>

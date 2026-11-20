@@ -1,10 +1,12 @@
 from django.urls import path
 
 from . import views
+from .api import recibir_ticket_web
 
 app_name = "soporte"
 
 urlpatterns = [
+    path("api/tickets/", recibir_ticket_web, name="api_tickets"),
     path(
         "tickets/",
         views.ticket_lista,

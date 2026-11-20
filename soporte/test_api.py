@@ -123,3 +123,33 @@ class SupportAPITests(TestCase):
             response = self.enviar()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(mail.outbox), 0)
+
+
+    @override_settings(
+        TG_SUPPORT_EMAIL_ENABLED=True,
+        TG_SUPPORT_NOTIFICATION_EMAIL="soporte-interno@example.com",
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        DEFAULT_FROM_EMAIL="no-reply@example.com",
+    )
+    def test_email_failure_does_not_rollback_ticket(self):
+        from unittest.mock import patch
+
+        with patch("soporte.notifications.EmailMultiAlternatives.send", side_effect=OSError("SMTP unavailable")):
+            with self.captureOnCommitCallbacks(execute=True):
+                response = self.enviar()
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Ticket.objects.count(), 1)
+        self.assertEqual(response.json()["codigo"], Ticket.objects.get().codigo)
+
+    def test_invalid_category_is_rejected_without_creating_ticket(self):
+        payload = {**self.payload, "categoria": "no_valida"}
+        response = self.enviar(payload)
+        self.assertEqual(response.status_code, 422)
+        self.assertFalse(Ticket.objects.exists())
+
+    def test_rejects_payload_over_size_limit(self):
+        payload = {**self.payload, "descripcion": "a" * 17000}
+        response = self.enviar(payload)
+        self.assertEqual(response.status_code, 413)
+        self.assertFalse(Ticket.objects.exists())

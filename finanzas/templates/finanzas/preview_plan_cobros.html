@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+{% block title %}Plan de cobros | TG Management{% endblock %}
+{% block content %}
+<div class="encabezado-pagina">
+  <h1>Previsualizar calendario de cobros</h1>
+  <p>Cotización {{ cotizacion.numero }} · {{ cotizacion.oportunidad.empresa.razon_social }}</p>
+  <p>Esta pantalla no genera ingresos ni solicita pagos. Revisa el plan antes de confirmarlo.</p>
+</div>
+<form method="get" class="panel formulario">
+  <div class="form-grid">
+    <div class="campo">
+      <label for="inicio">Fecha del pie inicial</label>
+      <input type="date" id="inicio" name="inicio" value="{{ fecha_texto }}" required class="form-control">
+    </div>
+    <div class="campo">
+      <label for="mantencion">Mantención mensual</label>
+      <select name="mantencion" id="mantencion" class="form-control">
+        <option value="0">No incluir</option>
+        <option value="1" {% if incluir_mantencion %}selected{% endif %}>Incluir 12 meses</option>
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="boton">Calcular calendario</button>
+  <a class="boton boton-secundario" href="{% url 'finanzas:bandeja_cobros' %}">Volver</a>
+</form>
+{% if error %}<div class="panel"><p role="alert">{{ error }}</p></div>{% endif %}
+{% if filas %}
+<div class="panel">
+  <h2>Vista previa · {{ filas|length }} cobros</h2>
+  <div class="tabla-responsive">
+    <table class="tabla">
+      <thead><tr><th>Concepto</th><th>Vencimiento</th><th>Monto CLP</th></tr></thead>
+      <tbody>
+        {% for fila in filas %}
+        <tr><td>{{ fila.concepto }}</td><td>{{ fila.fecha|date:"d/m/Y" }}</td><td>$ {{ fila.monto|floatformat:0 }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p>Solo previsualización. Todavía no se crean cobros ni enlaces de pago.</p>
+</div>
+{% endif %}
+{% endblock %}

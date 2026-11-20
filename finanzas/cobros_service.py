@@ -10,7 +10,10 @@ def distribuir_cuotas(total, cantidad):
         raise ValidationError("Monto y cantidad deben ser números válidos.")
     try:
         total = Decimal(str(total))
-        cantidad = int(cantidad)
+        cantidad_decimal = Decimal(str(cantidad))
+        if not cantidad_decimal.is_finite() or cantidad_decimal != cantidad_decimal.to_integral_value():
+            raise ValidationError("La cantidad de cuotas debe ser un entero.")
+        cantidad = int(cantidad_decimal)
     except (TypeError, ValueError, ArithmeticError):
         raise ValidationError("Monto y cantidad deben ser números válidos.")
     if not total.is_finite() or total <= 0 or total != total.to_integral_value():

@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from crm.models import Empresa
 from finanzas.models import Cobro, Ingreso
-from finanzas.mercadopago_sandbox import crear_preferencia
+from finanzas.mercadopago_sandbox import crear_preferencia, sandbox_configured
 
 
 class MercadoPagoSandboxTests(TestCase):
@@ -27,6 +27,40 @@ class MercadoPagoSandboxTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.cobro.refresh_from_db()
         self.assertEqual(self.cobro.estado, Cobro.Estado.PENDIENTE)
+
+    def test_app_usr_token_requires_explicit_opt_in(self):
+        env = {
+            "MP_SANDBOX_ENABLED": "1",
+            "MP_TEST_ACCESS_TOKEN": "APP_USR-example",
+            "MP_WEBHOOK_SECRET": "fake-test-secret",
+        }
+        with patch.dict("os.environ", env, clear=True):
+            self.assertFalse(sandbox_configured())
+            self.assertEqual(self.client.post(self.url).status_code, 403)
+        env["MP_ALLOW_APP_USR_TEST_TOKEN"] = "1"
+        with patch.dict("os.environ", env, clear=True):
+            self.assertTrue(sandbox_configured())
+            with patch("finanzas.mercadopago_sandbox._request", return_value={
+                "sandbox_init_point": "https://sandbox.mercadopago.com/checkout/pay?pref_id=test"
+            }):
+                response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response["Location"].startswith("https://sandbox.mercadopago.com/"))
+        self.cobro.refresh_from_db()
+        self.assertEqual(self.cobro.estado, Cobro.Estado.PENDIENTE)
+
+    def test_app_usr_opt_in_still_rejects_live_checkout(self):
+        env = {
+            "MP_SANDBOX_ENABLED": "1",
+            "MP_TEST_ACCESS_TOKEN": "APP_USR-example",
+            "MP_WEBHOOK_SECRET": "fake-test-secret",
+            "MP_ALLOW_APP_USR_TEST_TOKEN": "1",
+        }
+        with patch.dict("os.environ", env, clear=True):
+            with patch("finanzas.mercadopago_sandbox._request", return_value={
+                "sandbox_init_point": "https://www.mercadopago.com/checkout/pay"
+            }):
+                self.assertEqual(self.client.post(self.url).status_code, 400)
 
     def test_get_does_not_start_checkout(self):
         self.assertEqual(self.client.get(self.url).status_code, 405)

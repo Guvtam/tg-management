@@ -23,7 +23,7 @@ class SupportAPITests(TestCase):
         )
         self.payload = {
             "referencia": str(uuid4()), "nombre": "Ana Prueba",
-            "correo": "ana@example.com", "titulo": "Problema de acceso",
+            "correo": "ana@example.com", "categoria": "incidente", "impacto": "alto", "titulo": "Problema de acceso",
             "descripcion": "No puedo acceder al sistema.",
         }
 
@@ -54,6 +54,8 @@ class SupportAPITests(TestCase):
         self.assertEqual(ticket.empresa, self.empresa)
         self.assertEqual(ticket.contacto, self.contacto)
         self.assertEqual(ticket.estado, Ticket.Estado.ABIERTO)
+        self.assertEqual(ticket.categoria, Ticket.Categoria.INCIDENTE)
+        self.assertEqual(ticket.prioridad, Ticket.Prioridad.ALTA)
         self.assertEqual(ticket.canal, Ticket.Canal.FORMULARIO)
         self.assertEqual(ticket.descripcion, self.payload["descripcion"])
 

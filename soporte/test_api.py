@@ -87,3 +87,39 @@ class SupportAPITests(TestCase):
         response = self.enviar()
         self.assertEqual(response.status_code, 422)
         self.assertFalse(Ticket.objects.exists())
+
+
+    @override_settings(
+        TG_SUPPORT_EMAIL_ENABLED=True,
+        TG_SUPPORT_NOTIFICATION_EMAIL="soporte-interno@example.com",
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        DEFAULT_FROM_EMAIL="no-reply@example.com",
+    )
+    def test_new_ticket_sends_customer_and_internal_email(self):
+        from django.core import mail
+
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.enviar()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn(response.json()["codigo"], mail.outbox[0].subject)
+        self.assertEqual(mail.outbox[0].to, ["ana@example.com"])
+        self.assertEqual(mail.outbox[1].to, ["soporte-interno@example.com"])
+        self.assertEqual(len(mail.outbox[0].alternatives), 1)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            retry = self.enviar()
+        self.assertEqual(retry.status_code, 200)
+        self.assertEqual(len(mail.outbox), 2)
+
+    @override_settings(
+        TG_SUPPORT_EMAIL_ENABLED=False,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_notifications_disabled_by_default(self):
+        from django.core import mail
+
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.enviar()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(mail.outbox), 0)

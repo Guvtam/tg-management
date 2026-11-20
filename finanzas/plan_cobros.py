@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 
 from .cobros_service import plan_anticipo_cuotas
+from modalidades_pago.models import ModalidadPagoCotizacion
 
 
 def agregar_meses(fecha, meses):
@@ -25,7 +26,7 @@ def previsualizar_plan(cotizacion, fecha_inicio, incluir_mantencion=False):
         raise ValidationError("Debes indicar una fecha de inicio válida.")
     try:
         modalidad = cotizacion.configuracion_modalidades_pago
-    except cotizacion.__class__.configuracion_modalidades_pago.RelatedObjectDoesNotExist:
+    except ModalidadPagoCotizacion.DoesNotExist:
         raise ValidationError("Configura primero las modalidades de pago.")
     if not modalidad.mostrar_plan_12_meses:
         raise ValidationError("El plan de 12 cuotas no está habilitado.")

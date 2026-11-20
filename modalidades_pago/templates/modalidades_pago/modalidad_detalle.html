@@ -37,6 +37,9 @@
         </div>
 
         <div class="mp-detalle-acciones">
+            {% if request.user.is_staff and cotizacion.estado == "aprobada" and cotizacion.moneda == "CLP" and modalidad.mostrar_plan_12_meses %}
+            <a href="{% url 'finanzas:vista_previa_cobros' cotizacion.pk %}" class="boton">Previsualizar calendario</a>
+            {% endif %}
 
             <a
                 href="{% url 'modalidades_pago:configurar' cotizacion.pk %}"

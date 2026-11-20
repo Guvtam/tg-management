@@ -1,6 +1,7 @@
 from decimal import Decimal
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
+from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
 from .models import Cobro
@@ -8,6 +9,8 @@ from .plan_cobros import previsualizar_plan
 from .confirmar_cobros import confirmar_plan_cobros
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth.decorators import login_not_required
+from django.conf import settings
+from .mercadopago_sandbox import crear_preferencia, sandbox_configured
 from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib import messages
@@ -552,8 +555,30 @@ def detalle_cobro_publico(request, token):
     )
     response = render(request, "finanzas/detalle_cobro_publico.html", {
         "cobro": cobro,
+        "sandbox_habilitado": sandbox_configured(),
     })
     response["Cache-Control"] = "no-store, private"
     response["Referrer-Policy"] = "no-referrer"
     response["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     return response
+
+
+@login_not_required
+@require_POST
+def iniciar_pago_sandbox(request, token):
+    """Redirige exclusivamente a Checkout Pro sandbox, nunca a producción."""
+    if not sandbox_configured():
+        return HttpResponseForbidden("Pagos deshabilitados: sandbox no configurado.")
+    cobro = get_object_or_404(
+        Cobro.objects.select_related("ingreso"), token=token,
+    )
+    try:
+        enlace = crear_preferencia(
+            cobro,
+            url_retorno=request.build_absolute_uri(
+                reverse("finanzas:detalle_cobro_publico", args=[token])
+            ),
+        )
+    except ValidationError:
+        return HttpResponseBadRequest("No se pudo iniciar el pago de prueba.")
+    return redirect(enlace)

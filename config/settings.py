@@ -144,3 +144,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "login"
+
+# Shared secret for TG Technology server-to-server ticket submission.
+TG_SUPPORT_API_TOKEN = os.getenv("TG_SUPPORT_API_TOKEN", "")

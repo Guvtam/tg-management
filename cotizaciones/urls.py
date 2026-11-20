@@ -31,6 +31,8 @@ urlpatterns = [
         name="cotizacion_editar",
     ),
 
+    path("<int:pk>/estado/", views.cotizacion_cambiar_estado, name="cotizacion_cambiar_estado"),
+
     # Ítems
     path(
         "<int:cotizacion_pk>/items/nuevo/",

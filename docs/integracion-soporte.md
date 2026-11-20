@@ -22,3 +22,21 @@ Generar un secreto: `python -c "import secrets; print(secrets.token_urlsafe(48))
 - Ejecutar pruebas: `python manage.py test soporte.test_api` en Management y `python manage.py test core.test_support_api` en Technology.
 - La API rechaza correos sin coincidencia única con cliente activo; no crea clientes automáticamente.
 - Revisar `DEBUG`, `ALLOWED_HOSTS`, claves de Django, HTTPS, almacenamiento y respaldos antes del despliegue. La configuración actual de desarrollo NO es apta para producción.
+
+## Notificaciones por correo
+
+TG Management envía dos mensajes únicamente después de guardar un ticket nuevo:
+- Confirmación HTML + texto al correo del reportante con el código del ticket.
+- Aviso de texto a la casilla interna de soporte.
+
+Los reintentos con el mismo UUID no vuelven a enviar correos. Un fallo SMTP se registra en logs y no anula el ticket.
+
+**Desactivadas por defecto:** configurar estas variables en el servidor de TG Management (no en TG Technology):
+- `TG_SUPPORT_EMAIL_ENABLED=true`
+- `TG_SUPPORT_NOTIFICATION_EMAIL=<correo-interno>`
+- `DEFAULT_FROM_EMAIL=<remitente-verificado>`
+- `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` (o `EMAIL_USE_SSL`)
+
+Para pruebas sin correos reales, utilizar `EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend` o el backend de memoria en pruebas automatizadas.
+
+Antes de habilitar SMTP real, verificar la identidad del dominio remitente y su configuración SPF/DKIM/DMARC. Para producción con alto volumen conviene usar una cola persistente y reintentos supervisados; la implementación actual es síncrona y registra errores, pero no reintenta automáticamente.

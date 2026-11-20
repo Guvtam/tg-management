@@ -43,7 +43,7 @@
 <div class="panel">
   <div class="tabla-responsive">
     <table class="tabla">
-      <thead><tr><th>Cliente</th><th>Concepto</th><th>Cotización</th><th>Monto</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+      <thead><tr><th>Cliente</th><th>Concepto</th><th>Cotización</th><th>Monto</th><th>Vencimiento</th><th>Estado</th><th>Enlace de consulta</th></tr></thead>
       <tbody>
         {% for cobro in cobros %}
         <tr>
@@ -55,13 +55,14 @@
           <td>
             {% if cobro.vencido %}Vencido{% else %}{{ cobro.get_estado_display }}{% endif %}
           </td>
+          <td><a href="{% url 'finanzas:detalle_cobro_publico' cobro.token %}" target="_blank" rel="noopener noreferrer">Ver enlace</a></td>
         </tr>
-        {% empty %}
-        <tr><td colspan="6">Todavía no hay cobros registrados con estos filtros.</td></tr>
+        {% empty %>
+        <tr><td colspan="7">Todavía no hay cobros registrados con estos filtros.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <p>Mostrando hasta 200 registros. Los enlaces de pago estarán disponibles después de integrar y verificar la pasarela.</p>
+  <p>Mostrando hasta 200 registros. Los enlaces actuales son de consulta y no permiten pagar. Compártelos únicamente con el destinatario correspondiente.</p>
 </div>
 {% endblock %}

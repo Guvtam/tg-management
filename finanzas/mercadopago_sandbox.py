@@ -13,9 +13,15 @@ API = "https://api.mercadopago.com"
 
 def sandbox_configured():
     token = os.environ.get("MP_TEST_ACCESS_TOKEN", "")
+    # APP_USR- is not proof of a test credential. Require a second,
+    # explicit local opt-in before accepting that format.
+    allowed_token = token.startswith("TEST-") or (
+        token.startswith("APP_USR-")
+        and os.environ.get("MP_ALLOW_APP_USR_TEST_TOKEN") == "1"
+    )
     return (
         os.environ.get("MP_SANDBOX_ENABLED") == "1"
-        and token.startswith("TEST-")
+        and allowed_token
         and bool(os.environ.get("MP_WEBHOOK_SECRET"))
     )
 

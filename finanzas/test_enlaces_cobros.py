@@ -26,7 +26,7 @@ class EnlacesCobroTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Cuota desarrollo 1/12")
         self.assertContains(response, "60000")
-        self.assertContains(response, "no recibe pagos")
+        self.assertContains(response, "no recibe datos bancarios")
         self.assertEqual(response["Cache-Control"], "no-store, private")
         self.assertEqual(response["Referrer-Policy"], "no-referrer")
         self.assertIn("noindex", response["X-Robots-Tag"])

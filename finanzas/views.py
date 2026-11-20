@@ -476,14 +476,16 @@ def bandeja_cobros(request):
     hoy = timezone.localdate()
     resumen = cobros.aggregate(
         cantidad=Count("pk"),
-        monto_total=Sum("ingreso__monto"),
-        monto_pagado=Sum("ingreso__monto", filter=Q(estado=Cobro.Estado.PAGADO)),
-        monto_pendiente=Sum("ingreso__monto", filter=Q(estado__in=[
+        monto_total=Sum("ingreso__monto", filter=Q(ingreso__moneda=Moneda.CLP)),
+        monto_pagado=Sum("ingreso__monto", filter=Q(estado=Cobro.Estado.PAGADO, ingreso__moneda=Moneda.CLP)),
+        monto_pendiente=Sum("ingreso__monto", filter=Q(ingreso__moneda=Moneda.CLP, estado__in=[
             Cobro.Estado.PENDIENTE, Cobro.Estado.EN_PROCESO, Cobro.Estado.VENCIDO,
         ])),
         monto_vencido=Sum("ingreso__monto", filter=(
-            Q(estado=Cobro.Estado.VENCIDO) |
-            Q(estado=Cobro.Estado.PENDIENTE, ingreso__fecha_vencimiento__lt=hoy)
+            Q(ingreso__moneda=Moneda.CLP) & (
+                Q(estado=Cobro.Estado.VENCIDO) |
+                Q(estado=Cobro.Estado.PENDIENTE, ingreso__fecha_vencimiento__lt=hoy)
+            )
         )),
     )
     resumen = {clave: valor or 0 for clave, valor in resumen.items()}

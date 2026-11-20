@@ -1,4 +1,7 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+from django.views.decorators.http import require_POST
+from django.db import transaction
 from django.db.models import Max, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -505,3 +508,24 @@ def cotizacion_ver_pdf(request, pk):
         )
 
     return response
+
+@require_POST
+@user_passes_test(lambda user: user.is_authenticated and user.is_staff)
+def cotizacion_cambiar_estado(request, pk):
+    """Actualiza únicamente el estado desde el listado, con POST y CSRF."""
+    nuevo_estado = request.POST.get("estado", "")
+    estados_validos = {valor for valor, _ in Cotizacion.Estado.choices}
+    if nuevo_estado not in estados_validos:
+        messages.error(request, "El estado seleccionado no es válido.")
+        return redirect("cotizaciones:cotizacion_lista")
+
+    with transaction.atomic():
+        cotizacion = get_object_or_404(Cotizacion.objects.select_for_update(), pk=pk)
+        anterior = cotizacion.estado
+        if anterior != nuevo_estado:
+            cotizacion.estado = nuevo_estado
+            cotizacion.save(update_fields=["estado", "fecha_actualizacion"])
+            messages.success(request, f"{cotizacion.numero}: estado actualizado a {cotizacion.get_estado_display()}.")
+        else:
+            messages.info(request, "La cotización ya tenía ese estado.")
+    return redirect("cotizaciones:cotizacion_lista")

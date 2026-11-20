@@ -147,3 +147,16 @@ LOGOUT_REDIRECT_URL = "login"
 
 # Shared secret for TG Technology server-to-server ticket submission.
 TG_SUPPORT_API_TOKEN = os.getenv("TG_SUPPORT_API_TOKEN", "")
+
+# Support ticket emails: disabled until SMTP is configured and verified.
+TG_SUPPORT_EMAIL_ENABLED = os.getenv("TG_SUPPORT_EMAIL_ENABLED", "false").lower() == "true"
+TG_SUPPORT_NOTIFICATION_EMAIL = os.getenv("TG_SUPPORT_NOTIFICATION_EMAIL", "")
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "false").lower() == "true"
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@tg-technology.cl")

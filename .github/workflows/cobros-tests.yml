@@ -19,4 +19,4 @@ jobs:
       - name: Check pending model migrations
         run: python manage.py makemigrations --check --dry-run
       - name: Run collection tests
-        run: python manage.py test finanzas.test_cobros_service finanzas.test_cobros_model
+        run: python manage.py test finanzas.test_cobros_service finanzas.test_cobros_model finanzas.test_cobros_views

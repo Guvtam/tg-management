@@ -9,6 +9,7 @@ app_name = "finanzas"
 urlpatterns = [
     path("cobros/", views.bandeja_cobros, name="bandeja_cobros"),
     path("cobros/cotizacion/<int:cotizacion_pk>/previsualizar/", views.vista_previa_cobros, name="vista_previa_cobros"),
+    path("cobros/cotizacion/<int:cotizacion_pk>/confirmar/", views.confirmar_cobros_cotizacion, name="confirmar_cobros_cotizacion"),
     path(
         "",
         views.finanzas_inicio,

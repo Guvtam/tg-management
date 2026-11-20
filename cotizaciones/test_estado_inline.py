@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.template.loader import get_template
 
 from cotizaciones.models import Cotizacion
 
@@ -30,3 +31,7 @@ class EstadoCotizacionTests(TestCase):
         self.client.force_login(user)
         response = self.client.post(self.url, {"estado": "inventado"})
         self.assertRedirects(response, reverse("cotizaciones:cotizacion_lista"))
+
+    def test_list_template_compiles(self):
+        template = get_template("cotizaciones/cotizacion_lista.html")
+        self.assertIsNotNone(template)

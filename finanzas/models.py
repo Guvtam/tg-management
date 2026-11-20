@@ -195,3 +195,6 @@ class Gasto(models.Model):
             f"{self.concepto} - "
             f"{self.monto} {self.moneda}"
         )
+
+# Importado al final para registrar el modelo Cobro en Django.
+from .cobros import Cobro  # noqa: E402,F401

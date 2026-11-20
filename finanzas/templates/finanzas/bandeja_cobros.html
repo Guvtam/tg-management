@@ -30,6 +30,17 @@
   <a href="{% url 'finanzas:bandeja_cobros' %}" class="boton boton-secundario">Limpiar</a>
 </form>
 <div class="panel">
+  <h2>Resumen de cobros filtrados</h2>
+  <div class="form-grid">
+    <div class="campo"><strong>Total cobros</strong><p>{{ resumen.cantidad }}</p></div>
+    <div class="campo"><strong>Monto total CLP</strong><p>$ {{ resumen.monto_total|floatformat:0 }}</p></div>
+    <div class="campo"><strong>Pagado CLP</strong><p>$ {{ resumen.monto_pagado|floatformat:0 }}</p></div>
+    <div class="campo"><strong>Por cobrar CLP</strong><p>$ {{ resumen.monto_pendiente|floatformat:0 }}</p></div>
+    <div class="campo"><strong>Vencido CLP</strong><p>$ {{ resumen.monto_vencido|floatformat:0 }}</p></div>
+  </div>
+  <p>Los totales consideran todos los registros filtrados, no solo los 200 visibles. El monto vencido forma parte del monto por cobrar.</p>
+</div>
+<div class="panel">
   <div class="tabla-responsive">
     <table class="tabla">
       <thead><tr><th>Cliente</th><th>Concepto</th><th>Cotización</th><th>Monto</th><th>Vencimiento</th><th>Estado</th></tr></thead>

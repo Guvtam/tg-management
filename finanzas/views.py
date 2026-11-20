@@ -1,6 +1,9 @@
 from decimal import Decimal
 
 from django.http import JsonResponse
+from django.contrib.auth.decorators import user_passes_test
+from django.utils import timezone
+from .models import Cobro
 from django.contrib import messages
 from django.db.models import Q, Sum
 from django.shortcuts import (
@@ -448,4 +451,28 @@ def obtener_cotizaciones(request):
 
     return JsonResponse({
         "cotizaciones": cotizaciones,
+    })
+
+@user_passes_test(lambda user: user.is_authenticated and user.is_staff)
+def bandeja_cobros(request):
+    """Bandeja interna de cobros; no expone enlaces ni permite confirmar pagos."""
+    estado = request.GET.get("estado", "")
+    busqueda = request.GET.get("q", "").strip()
+    cobros = Cobro.objects.select_related("ingreso", "ingreso__empresa", "ingreso__cotizacion")
+    if estado in Cobro.Estado.values:
+        cobros = cobros.filter(estado=estado)
+    if busqueda:
+        cobros = cobros.filter(
+            Q(ingreso__concepto__icontains=busqueda)
+            | Q(ingreso__empresa__razon_social__icontains=busqueda)
+            | Q(ingreso__cotizacion__numero__icontains=busqueda)
+        )
+    cobros = cobros.order_by("ingreso__fecha_vencimiento", "pk")
+    hoy = timezone.localdate()
+    return render(request, "finanzas/bandeja_cobros.html", {
+        "cobros": cobros[:200],
+        "estados": Cobro.Estado.choices,
+        "estado_seleccionado": estado,
+        "busqueda": busqueda,
+        "hoy": hoy,
     })

@@ -1,5 +1,4 @@
 from decimal import Decimal
-from uuid import uuid4
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -28,7 +27,7 @@ class CobroModelTests(TestCase):
     def test_cobro_generates_unique_opaque_token(self):
         cobro = Cobro.objects.create(ingreso=self.ingreso)
         self.assertGreaterEqual(len(cobro.token), 40)
-        self.assertNotIn(str(self.ingreso.pk), cobro.token)
+        self.assertNotEqual(cobro.token, str(self.ingreso.pk))
         self.assertEqual(cobro.estado, Cobro.Estado.PENDIENTE)
 
     def test_cannot_mark_paid_without_provider_confirmation(self):

@@ -14,17 +14,18 @@
         </p>
     </div>
 
-    <div class="acciones">
+    <div class="acciones acciones-listado">
 
         <form method="get" class="buscador">
             <input
                 type="text"
                 name="q"
                 value="{{ busqueda }}"
-                placeholder="Buscar por nombre, empresa, cargo o correo"
+                aria-label="Buscar contactos por nombre, empresa, cargo o correo"
+                placeholder="Buscar contactos"
             >
 
-            <button type="submit" class="boton">
+            <button type="submit" class="boton boton-secundario">
                 Buscar
             </button>
 
@@ -73,7 +74,7 @@
                                         href="{% url 'crm:contacto_detalle' contacto.pk %}"
                                         class="enlace-tabla"
                                     >
-                                        {{ contacto }}
+                                        {{ contacto.nombres }} {{ contacto.apellidos }}
                                     </a>
                                 </td>
 

@@ -12,6 +12,7 @@ class InternalAccessTests(TestCase):
         paths = [
             "/",
             "/crm/empresas/",
+            "/solicitudes-web/",
             "/cotizaciones/",
             "/proyectos/",
             "/finanzas/",

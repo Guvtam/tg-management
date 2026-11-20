@@ -11,7 +11,7 @@
 
     <p>
         {{ ticket.codigo }} ·
-        {{ ticket.empresa }}
+        {{ ticket.empresa|default:"Cliente por identificar" }}
     </p>
 </div>
 
@@ -45,12 +45,15 @@
 
         <div class="detalle-item">
             <p>Cliente</p>
-            <strong>{{ ticket.empresa }}</strong>
+            <strong>{{ ticket.empresa|default:"Cliente por identificar" }}</strong>
         </div>
 
         <div class="detalle-item">
             <p>Reportado por</p>
-            <strong>{{ ticket.contacto|default:"—" }}</strong>
+            <strong>{{ ticket.contacto|default:ticket.nombre_reportante|default:"—" }}</strong>
+            {% if ticket.correo_reportante %}
+                <p><a class="enlace-tabla" href="mailto:{{ ticket.correo_reportante }}">{{ ticket.correo_reportante }}</a></p>
+            {% endif %}
         </div>
 
         <div class="detalle-item">

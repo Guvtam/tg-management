@@ -1,4 +1,9 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'core/css/finanzas-filtros.css' %}">
+{% endblock %}
 
 {% block title %}
     Finanzas | TG Management
@@ -6,128 +11,112 @@
 
 {% block content %}
 
-<div class="encabezado-pagina">
-    <h1>Finanzas</h1>
-
-    <p>
-        Control de ingresos, gastos y saldo del negocio.
-    </p>
-</div>
-
-<div class="acciones">
+<div class="acciones acciones-listado">
+    <div class="encabezado-pagina">
+        <h1>Finanzas</h1>
+        <p>Control de ingresos, gastos y saldo del negocio.</p>
+    </div>
     <div class="grupo-botones">
-        <a
-            href="{% url 'finanzas:ingreso_crear' %}"
-            class="boton"
-        >
-            Nuevo ingreso
-        </a>
-
-        <a
-            href="{% url 'finanzas:gasto_crear' %}"
-            class="boton boton-secundario"
-        >
-            Nuevo gasto
-        </a>
+        <a href="{% url 'finanzas:ingreso_crear' %}" class="boton">Nuevo ingreso</a>
+        <a href="{% url 'finanzas:gasto_crear' %}" class="boton boton-secundario">Nuevo gasto</a>
     </div>
 </div>
 
-<form method="get" class="panel filtros-form">
-    <div class="form-grid">
-        <div class="campo">
-            <label for="q">Buscar</label>
-
-            <input
-                type="text"
-                name="q"
-                id="q"
-                value="{{ busqueda }}"
-                class="form-control"
-                placeholder="Concepto, cliente, proveedor o proyecto"
-            >
-        </div>
-
-        <div class="campo">
-            <label for="moneda">Moneda</label>
-
-            <select
-                name="moneda"
-                id="moneda"
-                class="form-control"
-            >
-                {% for valor, nombre in monedas %}
-                    <option
-                        value="{{ valor }}"
-                        {% if moneda_seleccionada == valor %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ valor }} - {{ nombre }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="campo">
-            <label for="fecha_desde">Desde</label>
-
-            <input
-                type="date"
-                name="fecha_desde"
-                id="fecha_desde"
-                value="{{ fecha_desde }}"
-                class="form-control"
-            >
-        </div>
-
-        <div class="campo">
-            <label for="fecha_hasta">Hasta</label>
-
-            <input
-                type="date"
-                name="fecha_hasta"
-                id="fecha_hasta"
-                value="{{ fecha_hasta }}"
-                class="form-control"
-            >
-        </div>
-
-        <div class="campo">
-            <label for="estado">Estado del ingreso</label>
-
-            <select
-                name="estado"
-                id="estado"
-                class="form-control"
-            >
-                <option value="">Todos</option>
-
-                {% for valor, nombre in estados %}
-                    <option
-                        value="{{ valor }}"
-                        {% if estado_seleccionado == valor %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ nombre }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-
-    <div class="form-actions">
-        <button type="submit" class="boton">
-            Filtrar
-        </button>
-
-        <a
-            href="{% url 'finanzas:finanzas_inicio' %}"
-            class="boton boton-secundario"
+<form method="get" class="panel filtros-form finanzas-barra" aria-label="Filtrar movimientos">
+    <div class="finanzas-busqueda">
+        <input
+            type="search"
+            name="q"
+            id="q"
+            value="{{ busqueda }}"
+            class="form-control"
+            aria-label="Buscar por concepto, cliente, proveedor o proyecto"
+            placeholder="Buscar movimientos"
         >
-            Limpiar
-        </a>
+        <button type="submit" class="boton boton-secundario">Buscar</button>
+        {% if busqueda or fecha_desde or fecha_hasta or estado_seleccionado or moneda_seleccionada != "CLP" %}
+            <a href="{% url 'finanzas:finanzas_inicio' %}" class="enlace-tabla">Limpiar</a>
+        {% endif %}
     </div>
+
+    <details class="finanzas-filtros">
+        <summary class="boton boton-secundario">
+            Más filtros
+            {% if fecha_desde or fecha_hasta or estado_seleccionado or moneda_seleccionada != "CLP" %}
+                <span class="finanzas-filtros-activos">Activos</span>
+            {% endif %}
+        </summary>
+        <div class="finanzas-filtros-campos">
+            <div class="campo">
+                <label for="moneda">Moneda</label>
+
+                <select
+                    name="moneda"
+                    id="moneda"
+                    class="form-control"
+                >
+                    {% for valor, nombre in monedas %}
+                        <option
+                            value="{{ valor }}"
+                            {% if moneda_seleccionada == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ valor }} - {{ nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="fecha_desde">Desde</label>
+
+                <input
+                    type="date"
+                    name="fecha_desde"
+                    id="fecha_desde"
+                    value="{{ fecha_desde }}"
+                    class="form-control"
+                >
+            </div>
+
+            <div class="campo">
+                <label for="fecha_hasta">Hasta</label>
+
+                <input
+                    type="date"
+                    name="fecha_hasta"
+                    id="fecha_hasta"
+                    value="{{ fecha_hasta }}"
+                    class="form-control"
+                >
+            </div>
+
+            <div class="campo">
+                <label for="estado">Estado del ingreso</label>
+
+                <select
+                    name="estado"
+                    id="estado"
+                    class="form-control"
+                >
+                    <option value="">Todos</option>
+
+                    {% for valor, nombre in estados %}
+                        <option
+                            value="{{ valor }}"
+                            {% if estado_seleccionado == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="boton boton-secundario">Aplicar filtros</button>
+        </div>
+    </details>
 </form>
 
 <div class="resumen-finanzas">
@@ -136,7 +125,7 @@
 
         <strong>
             {{ moneda_seleccionada }}
-            {{ total_ingresos|floatformat:0 }}
+            {{ total_ingresos|floatformat:"0g" }}
         </strong>
     </div>
 
@@ -145,7 +134,7 @@
 
         <strong>
             {{ moneda_seleccionada }}
-            {{ ingresos_pagados|floatformat:0 }}
+            {{ ingresos_pagados|floatformat:"0g" }}
         </strong>
     </div>
 
@@ -154,7 +143,7 @@
 
         <strong>
             {{ moneda_seleccionada }}
-            {{ ingresos_pendientes|floatformat:0 }}
+            {{ ingresos_pendientes|floatformat:"0g" }}
         </strong>
     </div>
 
@@ -163,7 +152,7 @@
 
         <strong>
             {{ moneda_seleccionada }}
-            {{ total_gastos|floatformat:0 }}
+            {{ total_gastos|floatformat:"0g" }}
         </strong>
     </div>
 
@@ -172,27 +161,14 @@
 
         <strong>
             {{ moneda_seleccionada }}
-            {{ saldo|floatformat:0 }}
+            {{ saldo|floatformat:"0g" }}
         </strong>
     </div>
 </div>
 
 <section class="panel">
-    <div class="acciones">
-        <div>
-            <h2>Ingresos</h2>
-
-            <p class="texto-secundario">
-                Cobros emitidos y pagos recibidos.
-            </p>
-        </div>
-
-        <a
-            href="{% url 'finanzas:ingreso_crear' %}"
-            class="boton"
-        >
-            Nuevo ingreso
-        </a>
+    <div class="encabezado-seccion">
+        <h2>Ingresos</h2>
     </div>
 
     {% if ingresos %}
@@ -228,7 +204,7 @@
                             </td>
 
                             <td>
-                                {{ ingreso.empresa.nombre }}
+                                {{ ingreso.empresa }}
                             </td>
 
                             <td>
@@ -248,7 +224,7 @@
                             <td>
                                 <strong>
                                     {{ ingreso.moneda }}
-                                    {{ ingreso.monto|floatformat:0 }}
+                                    {{ ingreso.monto|floatformat:"0g" }}
                                 </strong>
                             </td>
 
@@ -291,21 +267,8 @@
 </section>
 
 <section class="panel">
-    <div class="acciones">
-        <div>
-            <h2>Gastos</h2>
-
-            <p class="texto-secundario">
-                Costos y egresos del negocio.
-            </p>
-        </div>
-
-        <a
-            href="{% url 'finanzas:gasto_crear' %}"
-            class="boton"
-        >
-            Nuevo gasto
-        </a>
+    <div class="encabezado-seccion">
+        <h2>Gastos</h2>
     </div>
 
     {% if gastos %}
@@ -353,7 +316,7 @@
                             <td>
                                 <strong>
                                     {{ gasto.moneda }}
-                                    {{ gasto.monto|floatformat:0 }}
+                                    {{ gasto.monto|floatformat:"0g" }}
                                 </strong>
                             </td>
 

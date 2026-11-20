@@ -4,6 +4,10 @@ from .models import InteraccionTicket, Ticket
 
 
 class TicketForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["empresa"].required = self.instance.solicitud_web_id is None
+
     class Meta:
         model = Ticket
         fields = [

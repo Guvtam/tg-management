@@ -13,17 +13,18 @@
         </p>
     </div>
 
-    <div class="acciones">
+    <div class="acciones acciones-listado">
 
         <form method="get" class="buscador">
             <input
                 type="text"
                 name="q"
                 value="{{ busqueda }}"
-                placeholder="Buscar por nombre, RUT, comuna o rubro"
+                aria-label="Buscar empresas por nombre, RUT, comuna o rubro"
+                placeholder="Buscar empresas"
             >
 
-            <button type="submit" class="boton">
+            <button type="submit" class="boton boton-secundario">
                 Buscar
             </button>
 

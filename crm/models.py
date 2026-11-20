@@ -183,6 +183,13 @@ class Oportunidad(models.Model):
         ALTA = "ALTA", "Alta"
         URGENTE = "URGENTE", "Urgente"
 
+    solicitud_web_id = models.PositiveBigIntegerField(
+        "Solicitud web",
+        null=True,
+        blank=True,
+        unique=True,
+        editable=False,
+    )
     titulo = models.CharField(
         "Nombre de la oportunidad",
         max_length=200,

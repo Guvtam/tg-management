@@ -1,0 +1,7 @@
+{% if oportunidad or contact.oportunidad_id %}
+    <span class="estado estado-completado">Convertida</span>
+{% elif contact.is_contacted %}
+    <span class="estado">Contactada</span>
+{% else %}
+    <span class="estado estado-pendiente">Pendiente de contacto</span>
+{% endif %}

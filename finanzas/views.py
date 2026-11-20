@@ -57,7 +57,8 @@ def finanzas_inicio(request):
     if busqueda:
         ingresos = ingresos.filter(
             Q(concepto__icontains=busqueda)
-            | Q(empresa__nombre__icontains=busqueda)
+            | Q(empresa__razon_social__icontains=busqueda)
+            | Q(empresa__nombre_fantasia__icontains=busqueda)
             | Q(proyecto__nombre__icontains=busqueda)
         )
 

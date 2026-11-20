@@ -1,0 +1,53 @@
+{% extends "core/base.html" %}
+
+{% block title %}Solicitudes web | TG Management{% endblock %}
+
+{% block content %}
+    <div class="encabezado-pagina">
+        <h1>Solicitudes web</h1>
+        <p>Consultas recibidas desde el formulario de TG Technology.</p>
+    </div>
+
+    <div class="panel">
+        {% if unavailable %}
+            <p class="sin-registros" role="status">No se pudo conectar con la base local de TG Technology.</p>
+        {% elif not contacts %}
+            <p class="sin-registros">Todavía no hay solicitudes web.</p>
+        {% else %}
+            <div class="tabla-contenedor">
+                <table aria-label="Solicitudes recibidas">
+                    <thead>
+                        <tr>
+                            <th scope="col">Contacto</th>
+                            <th scope="col">Negocio</th>
+                            <th scope="col">Servicio</th>
+                            <th scope="col">Recibida</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col" class="columna-accion">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                            <tr>
+                                <td><a class="enlace-tabla" href="{% url 'core:solicitud_web_detalle' contact.id %}">{{ contact.name }}</a></td>
+                                <td>{{ contact.company|default:"—" }}</td>
+                                <td>{{ contact.service }}</td>
+                                <td>{{ contact.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>{% include "core/solicitud_web_estado.html" %}</td>
+                                <td class="columna-accion"><a class="enlace-tabla" href="{% url 'core:solicitud_web_detalle' contact.id %}" aria-label="Ver detalle de {{ contact.name }}">Ver detalle</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <nav class="acciones-formulario" aria-label="Páginas de solicitudes">
+            {% if page_obj.has_previous %}<a class="boton boton-secundario" href="?page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %}
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a class="boton boton-secundario" href="?page={{ page_obj.next_page_number }}">Siguiente</a>{% endif %}
+        </nav>
+    {% endif %}
+{% endblock %}

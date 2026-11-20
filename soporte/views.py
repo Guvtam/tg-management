@@ -26,6 +26,8 @@ def ticket_lista(request):
             | Q(codigo__icontains=busqueda)
             | Q(empresa__razon_social__icontains=busqueda)
             | Q(empresa__nombre_fantasia__icontains=busqueda)
+            | Q(nombre_reportante__icontains=busqueda)
+            | Q(correo_reportante__icontains=busqueda)
         )
 
     if estado:

@@ -186,6 +186,10 @@ body {
     overflow-x: auto;
 }
 
+.panel:has(> table) {
+    overflow-x: auto;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -200,8 +204,13 @@ td {
 }
 
 th {
+    background-color: #f8fafc;
     color: var(--color-texto-secundario);
     font-weight: 600;
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
 }
 
 tbody tr:hover {
@@ -239,70 +248,89 @@ tbody tr:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 12px 16px;
     margin-bottom: 22px;
 }
 
-.grupo-botones {
+.acciones > .encabezado-pagina {
+    margin-bottom: 0;
+}
+
+.grupo-botones,
+.acciones-formulario {
     display: flex;
     align-items: center;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .acciones-formulario {
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
+    margin-top: 20px;
 }
 
 /* Botones */
 
 .boton {
-    display: inline-block;
-    padding: 11px 16px;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid transparent;
     border-radius: 8px;
     background-color: var(--color-acento);
     color: var(--color-principal);
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
+    font: 700 14px / 1.35 Arial, Helvetica, sans-serif;
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
 }
 
-.boton:hover {
-    opacity: 0.9;
+.boton:not(.boton-secundario, .boton-exito, .boton-peligro):hover {
+    background-color: #7dd3fc;
+}
+
+.boton:focus-visible,
+.enlace-tabla:focus-visible,
+.menu a:focus-visible {
+    outline: 2px solid #0284c7;
+    outline-offset: 3px;
 }
 
 .boton:active {
     transform: translateY(1px);
 }
 
+.boton:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .boton-secundario {
-    background-color: #e2e8f0;
+    border-color: var(--color-borde);
+    background-color: var(--color-blanco);
     color: var(--color-principal);
 }
 
-.boton-peligro {
-    background-color: #fee2e2;
-    color: var(--color-peligro);
+.boton-secundario:hover {
+    background-color: #eaf0f6;
 }
 
 /* Buscador */
 
 .buscador {
     display: flex;
-    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
 }
 
 .buscador input {
-    min-width: 280px;
-    padding: 11px 12px;
+    width: min(360px, 100%);
+    min-height: 40px;
+    padding: 8px 12px;
     border: 1px solid var(--color-borde);
     border-radius: 8px;
     font-family: inherit;
@@ -433,7 +461,8 @@ textarea.form-control {
 }
 
 .panel + .panel,
-.tarjetas + .panel {
+.tarjetas + .panel,
+.filtros-form + .resumen-finanzas {
     margin-top: 24px;
 }
 
@@ -468,6 +497,10 @@ textarea.form-control {
 .boton-exito {
     background-color: #dcfce7;
     color: #166534;
+}
+
+.boton-exito:hover {
+    background-color: #bbf7d0;
 }
 
 .estado-pendiente {
@@ -527,7 +560,8 @@ textarea.form-control {
 }
 
 .boton-pequeno {
-    padding: 7px 10px;
+    min-height: 34px;
+    padding: 5px 10px;
     font-size: 13px;
 }
 
@@ -1054,9 +1088,8 @@ textarea.form-control {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .acciones {
-        align-items: stretch;
-        flex-direction: column;
+    .acciones > .filtros {
+        min-width: 0;
     }
 }
 
@@ -1105,10 +1138,13 @@ textarea.form-control {
         min-width: 0;
     }
 
+    .acciones {
+        align-items: flex-start;
+    }
+
     .grupo-botones,
     .acciones-formulario {
-        align-items: stretch;
-        flex-direction: column;
+        align-items: center;
     }
 }
 
@@ -1566,5 +1602,45 @@ textarea.form-control {
 
     .pie-login {
         margin-top: 18px;
+    }
+}
+
+.acciones-listado {
+    align-items: center;
+}
+
+.acciones-listado .buscador {
+    flex: 1 1 360px;
+    min-width: 0;
+    flex-direction: row;
+}
+
+.acciones-listado .buscador input {
+    flex: 1 1 180px;
+    width: 0;
+    min-width: 0;
+    max-width: 340px;
+}
+
+.acciones-listado .buscador input::placeholder {
+    color: #64748b;
+}
+
+.encabezado-seccion h2 {
+    margin-bottom: 14px;
+}
+
+.columna-accion {
+    text-align: right;
+    white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+    .acciones-listado .buscador {
+        flex-basis: 100%;
+    }
+
+    .acciones-listado .buscador input {
+        max-width: none;
     }
 }

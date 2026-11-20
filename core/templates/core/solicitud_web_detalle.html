@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+
+{% block title %}Solicitud de {{ contact.name }} | TG Management{% endblock %}
+
+{% block content %}
+    <div class="acciones">
+        <div class="encabezado-pagina">
+            <h1>Solicitud de {{ contact.name }}</h1>
+            <p>Recibida el {{ contact.created_at|date:"d/m/Y" }} a las {{ contact.created_at|date:"H:i" }}</p>
+        </div>
+        <div class="grupo-botones">
+            {% if oportunidad %}
+                <a class="boton" href="{% url 'crm:oportunidad_detalle' oportunidad.pk %}">Ver oportunidad</a>
+            {% else %}
+                <form method="post" action="{% url 'core:convertir_solicitud_web' contact.id %}">
+                    {% csrf_token %}
+                    <button class="boton" type="submit">Convertir en oportunidad</button>
+                </form>
+            {% endif %}
+            <a class="boton boton-secundario" href="{% url 'core:solicitudes_web' %}">Volver</a>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="detalle-grid">
+            <div class="detalle-item"><p>Negocio</p><strong>{{ contact.company|default:"—" }}</strong></div>
+            <div class="detalle-item"><p>Servicio</p><strong>{{ contact.service }}</strong></div>
+            <div class="detalle-item">
+                <p>Correo electrónico</p>
+                <strong><a class="enlace-tabla" href="mailto:{{ contact.email }}">{{ contact.email }}</a></strong>
+            </div>
+            <div class="detalle-item">
+                <p>Teléfono</p>
+                {% if contact.phone %}<strong><a class="enlace-tabla" href="tel:{{ contact.phone }}">{{ contact.phone }}</a></strong>{% else %}<strong>—</strong>{% endif %}
+            </div>
+            <div class="detalle-item"><p>Estado</p>{% include "core/solicitud_web_estado.html" %}</div>
+            {% if contact.budget %}
+                <div class="detalle-item"><p>Presupuesto informado</p><strong>{{ contact.budget }}</strong></div>
+            {% endif %}
+            <div class="detalle-item campo-completo"><p>Mensaje</p><div class="texto-con-saltos">{{ contact.message }}</div></div>
+        </div>
+    </div>
+{% endblock %}

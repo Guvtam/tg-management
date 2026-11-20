@@ -56,7 +56,13 @@ class Ticket(models.Model):
         verbose_name="Cliente",
         on_delete=models.PROTECT,
         related_name="tickets",
+        null=True,
+        blank=True,
     )
+
+    solicitud_web_id = models.UUIDField(null=True, blank=True, unique=True, editable=False)
+    nombre_reportante = models.CharField("Nombre del reportante", max_length=120, blank=True)
+    correo_reportante = models.EmailField("Correo del reportante", blank=True)
 
     contacto = models.ForeignKey(
         "crm.Contacto",

@@ -1,0 +1,56 @@
+{% extends "core/base.html" %}
+{% block title %}Cobros | TG Management{% endblock %}
+{% block content %}
+<div class="acciones acciones-listado">
+  <div class="encabezado-pagina">
+    <h1>Bandeja de cobros</h1>
+    <p>Consulta los cobros generados, sus vencimientos y estados. Los pagos electrónicos todavía no están habilitados.</p>
+  </div>
+  <div class="grupo-botones">
+    <a class="boton boton-secundario" href="{% url 'finanzas:finanzas_inicio' %}">Volver a finanzas</a>
+  </div>
+</div>
+<form method="get" class="panel filtros-form" aria-label="Filtros de cobros">
+  <div class="form-grid">
+    <div class="campo">
+      <label for="q">Buscar cliente, concepto o cotización</label>
+      <input class="form-control" type="search" id="q" name="q" value="{{ busqueda }}" placeholder="Ej. cuota de desarrollo">
+    </div>
+    <div class="campo">
+      <label for="estado">Estado</label>
+      <select class="form-control" name="estado" id="estado">
+        <option value="">Todos los estados</option>
+        {% for valor, nombre in estados %}
+        <option value="{{ valor }}" {% if estado_seleccionado == valor %}selected{% endif %}>{{ nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="boton">Filtrar</button>
+  <a href="{% url 'finanzas:bandeja_cobros' %}" class="boton boton-secundario">Limpiar</a>
+</form>
+<div class="panel">
+  <div class="tabla-responsive">
+    <table class="tabla">
+      <thead><tr><th>Cliente</th><th>Concepto</th><th>Cotización</th><th>Monto</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+      <tbody>
+        {% for cobro in cobros %}
+        <tr>
+          <td>{{ cobro.ingreso.empresa.razon_social }}</td>
+          <td>{{ cobro.ingreso.concepto }}</td>
+          <td>{{ cobro.ingreso.cotizacion.numero|default:"—" }}</td>
+          <td>{{ cobro.ingreso.monto }} {{ cobro.ingreso.moneda }}</td>
+          <td>{{ cobro.ingreso.fecha_vencimiento|date:"d/m/Y"|default:"Sin vencimiento" }}</td>
+          <td>
+            {% if cobro.vencido %}Vencido{% else %}{{ cobro.get_estado_display }}{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Todavía no hay cobros registrados con estos filtros.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p>Mostrando hasta 200 registros. Los enlaces de pago estarán disponibles después de integrar y verificar la pasarela.</p>
+</div>
+{% endblock %}

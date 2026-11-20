@@ -21,6 +21,8 @@ class SolicitudAPIForm(forms.Form):
     referencia = forms.UUIDField()
     nombre = forms.CharField(max_length=120)
     correo = forms.EmailField()
+    categoria = forms.ChoiceField(required=False, choices=Ticket.Categoria.choices)
+    impacto = forms.ChoiceField(required=False, choices=[("bajo", "Bajo"), ("medio", "Medio"), ("alto", "Alto")])
     titulo = forms.CharField(max_length=200)
     descripcion = forms.CharField(max_length=5000)
 
@@ -76,6 +78,8 @@ def recibir_ticket_web(request):
                 solicitud_web_id=data["referencia"], empresa=empresa, contacto=contacto,
                 nombre_reportante=data["nombre"], correo_reportante=data["correo"],
                 titulo=data["titulo"], descripcion=data["descripcion"],
+                categoria=data.get("categoria") or Ticket.Categoria.INCIDENTE,
+                prioridad={"bajo": Ticket.Prioridad.BAJA, "medio": Ticket.Prioridad.MEDIA, "alto": Ticket.Prioridad.ALTA}.get(data.get("impacto"), Ticket.Prioridad.MEDIA),
                 canal=Ticket.Canal.FORMULARIO,
             )
     except IntegrityError:

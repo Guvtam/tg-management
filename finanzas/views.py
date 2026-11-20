@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib import messages
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count
 from django.shortcuts import (
     get_object_or_404,
     redirect,
@@ -474,7 +474,21 @@ def bandeja_cobros(request):
         )
     cobros = cobros.order_by("ingreso__fecha_vencimiento", "pk")
     hoy = timezone.localdate()
+    resumen = cobros.aggregate(
+        cantidad=Count("pk"),
+        monto_total=Sum("ingreso__monto"),
+        monto_pagado=Sum("ingreso__monto", filter=Q(estado=Cobro.Estado.PAGADO)),
+        monto_pendiente=Sum("ingreso__monto", filter=Q(estado__in=[
+            Cobro.Estado.PENDIENTE, Cobro.Estado.EN_PROCESO, Cobro.Estado.VENCIDO,
+        ])),
+        monto_vencido=Sum("ingreso__monto", filter=(
+            Q(estado=Cobro.Estado.VENCIDO) |
+            Q(estado=Cobro.Estado.PENDIENTE, ingreso__fecha_vencimiento__lt=hoy)
+        )),
+    )
+    resumen = {clave: valor or 0 for clave, valor in resumen.items()}
     return render(request, "finanzas/bandeja_cobros.html", {
+        "resumen": resumen,
         "cobros": cobros[:200],
         "estados": Cobro.Estado.choices,
         "estado_seleccionado": estado,

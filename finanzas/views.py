@@ -539,3 +539,18 @@ def confirmar_cobros_cotizacion(request, cotizacion_pk):
         return redirect("finanzas:vista_previa_cobros", cotizacion_pk=cotizacion_pk)
     messages.success(request, f"Se generaron {len(creados)} cobros pendientes correctamente.")
     return redirect("finanzas:bandeja_cobros")
+
+
+def detalle_cobro_publico(request, token):
+    """Consulta pública de solo lectura mediante un token aleatorio no enumerables."""
+    cobro = get_object_or_404(
+        Cobro.objects.select_related("ingreso"),
+        token=token,
+    )
+    response = render(request, "finanzas/detalle_cobro_publico.html", {
+        "cobro": cobro,
+    })
+    response["Cache-Control"] = "no-store, private"
+    response["Referrer-Policy"] = "no-referrer"
+    response["X-Robots-Tag"] = "noindex, nofollow, noarchive"
+    return response

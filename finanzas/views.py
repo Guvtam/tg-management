@@ -505,6 +505,7 @@ def vista_previa_cobros(request, cotizacion_pk):
         "incluir_mantencion": incluir_mantencion,
         "filas": filas,
         "error": error,
+        "plan_existente": Ingreso.objects.filter(cotizacion=cotizacion).exists(),
     })
 
 

@@ -7,6 +7,7 @@ from django import forms
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_not_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -41,6 +42,7 @@ def cliente_por_correo(correo):
     return (empresas[0], None) if len(empresas) == 1 else (None, None)
 
 
+@login_not_required
 @csrf_exempt  # Autenticación servidor-a-servidor mediante token, no cookies.
 @require_POST
 def recibir_ticket_web(request):

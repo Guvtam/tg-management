@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 
 from crm.models import Contacto, Empresa
 from soporte.models import Ticket
+from soporte.notifications import enviar_avisos_ticket
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,7 @@ def recibir_ticket_web(request):
                 prioridad={"bajo": Ticket.Prioridad.BAJA, "medio": Ticket.Prioridad.MEDIA, "alto": Ticket.Prioridad.ALTA}.get(data.get("impacto"), Ticket.Prioridad.MEDIA),
                 canal=Ticket.Canal.FORMULARIO,
             )
+            transaction.on_commit(lambda pk=ticket.pk: enviar_avisos_ticket(pk), robust=True)
     except IntegrityError:
         logger.warning("Conflicto al registrar ticket web")
         return JsonResponse({"error": "conflicto_temporal"}, status=409)

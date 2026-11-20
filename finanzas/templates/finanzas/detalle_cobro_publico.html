@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+{% block title %}Detalle de cobro | TG Technology{% endblock %}
+{% block content %}
+<div class="encabezado-pagina">
+  <h1>Detalle de cobro</h1>
+  <p>Consulta el importe y vencimiento de tu cuota.</p>
+</div>
+<div class="panel">
+  <h2>{{ cobro.ingreso.concepto }}</h2>
+  <p><strong>Importe:</strong> {{ cobro.ingreso.monto|floatformat:0 }} {{ cobro.ingreso.moneda }}</p>
+  <p><strong>Vencimiento:</strong> {{ cobro.ingreso.fecha_vencimiento|date:"d/m/Y"|default:"Sin vencimiento" }}</p>
+  <p><strong>Estado:</strong> {% if cobro.vencido %}Vencido{% else %}{{ cobro.get_estado_display }}{% endif %}</p>
+  {% if cobro.estado == "anulado" %}
+    <p>Este cobro fue anulado y no está disponible para pago.</p>
+  {% elif cobro.estado == "pagado" %}
+    <p>Este cobro figura como pagado.</p>
+  {% else %}
+    <p>El pago electrónico todavía no está habilitado. Esta página es informativa y no recibe pagos ni datos bancarios.</p>
+  {% endif %}
+</div>
+{% endblock %}

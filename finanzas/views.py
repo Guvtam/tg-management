@@ -4,6 +4,9 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
 from .models import Cobro
+from .plan_cobros import previsualizar_plan
+from django.core.exceptions import ValidationError
+from datetime import date
 from django.contrib import messages
 from django.db.models import Q, Sum
 from django.shortcuts import (
@@ -475,4 +478,29 @@ def bandeja_cobros(request):
         "estado_seleccionado": estado,
         "busqueda": busqueda,
         "hoy": hoy,
+    })
+
+
+@user_passes_test(lambda user: user.is_authenticated and user.is_staff)
+def vista_previa_cobros(request, cotizacion_pk):
+    """Vista previa solamente: ninguna escritura de cobros ni ingresos."""
+    cotizacion = get_object_or_404(
+        Cotizacion.objects.select_related("oportunidad", "oportunidad__empresa"),
+        pk=cotizacion_pk,
+    )
+    fecha_texto = request.GET.get("inicio", "")
+    filas, error = [], None
+    incluir_mantencion = request.GET.get("mantencion") == "1"
+    if fecha_texto:
+        try:
+            fecha = date.fromisoformat(fecha_texto)
+            filas = previsualizar_plan(cotizacion, fecha, incluir_mantencion)
+        except (ValueError, ValidationError) as exc:
+            error = str(exc)
+    return render(request, "finanzas/preview_plan_cobros.html", {
+        "cotizacion": cotizacion,
+        "fecha_texto": fecha_texto,
+        "incluir_mantencion": incluir_mantencion,
+        "filas": filas,
+        "error": error,
     })

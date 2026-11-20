@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -14,6 +15,7 @@ from .models import ModalidadPagoCotizacion
 class ModalidadesPagoTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.operador = get_user_model().objects.create_user(username="operador")
         empresa = Empresa.objects.create(razon_social="Pyme de Prueba")
         oportunidad = Oportunidad.objects.create(titulo="Sitio corporativo", empresa=empresa)
         cls.cotizacion = Cotizacion.objects.create(
@@ -51,6 +53,7 @@ class ModalidadesPagoTests(TestCase):
             modalidad.full_clean()
 
     def test_lista_y_formulario_responden(self):
+        self.client.force_login(self.operador)
         self.assertEqual(self.client.get(reverse("modalidades_pago:lista")).status_code, 200)
         self.assertEqual(
             self.client.get(reverse("modalidades_pago:configurar", args=[self.cotizacion.pk])).status_code,
@@ -58,6 +61,7 @@ class ModalidadesPagoTests(TestCase):
         )
 
     def test_guardado_desde_formulario(self):
+        self.client.force_login(self.operador)
         response = self.client.post(
             reverse("modalidades_pago:configurar", args=[self.cotizacion.pk]),
             {

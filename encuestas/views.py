@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.db.models import Avg, Count, Q
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
@@ -142,6 +142,7 @@ def encuesta_anular(request, pk):
     return redirect("encuestas:detalle", pk=encuesta.pk)
 
 
+@login_not_required
 def encuesta_responder(request, token):
     encuesta = get_object_or_404(
         EncuestaSatisfaccion.objects.select_related("proyecto", "empresa"),
@@ -179,6 +180,7 @@ def encuesta_responder(request, token):
     )
 
 
+@login_not_required
 def encuesta_gracias(request, token):
     encuesta = get_object_or_404(EncuestaSatisfaccion, token=token)
     if not encuesta.respondida:

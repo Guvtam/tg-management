@@ -15,7 +15,14 @@
   {% elif cobro.estado == "pagado" %}
     <p>Este cobro figura como pagado.</p>
   {% else %}
-    <p>El pago electrónico todavía no está habilitado. Esta página es informativa y no recibe pagos ni datos bancarios.</p>
+    <p>El pago electrónico real todavía no está habilitado. Esta página no recibe datos bancarios.</p>
+    {% if sandbox_habilitado and cobro.ingreso.moneda == "CLP" %}
+      <form method="post" action="{% url 'finanzas:iniciar_pago_sandbox' cobro.token %}">
+        {% csrf_token %}
+        <button type="submit" class="boton">Probar pago en Mercado Pago (sandbox)</button>
+      </form>
+      <p>Pruebas únicamente. No uses dinero ni tarjetas reales.</p>
+    {% endif %}
   {% endif %}
 </div>
 {% endblock %}

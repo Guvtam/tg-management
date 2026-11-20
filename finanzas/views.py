@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.utils import timezone
 from .models import Cobro
 from .plan_cobros import previsualizar_plan
+from .confirmar_cobros import confirmar_plan_cobros
+from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib import messages
@@ -504,3 +506,19 @@ def vista_previa_cobros(request, cotizacion_pk):
         "filas": filas,
         "error": error,
     })
+
+
+@require_POST
+@user_passes_test(lambda user: user.is_authenticated and user.is_staff)
+def confirmar_cobros_cotizacion(request, cotizacion_pk):
+    """Solo POST autenticado; recalcula los importes en servidor."""
+    fecha_texto = request.POST.get("inicio", "")
+    incluir_mantencion = request.POST.get("mantencion") == "1"
+    try:
+        fecha_inicio = date.fromisoformat(fecha_texto)
+        creados = confirmar_plan_cobros(cotizacion_pk, fecha_inicio, incluir_mantencion)
+    except (ValueError, ValidationError) as exc:
+        messages.error(request, f"No se generaron cobros: {exc}")
+        return redirect("finanzas:vista_previa_cobros", cotizacion_pk=cotizacion_pk)
+    messages.success(request, f"Se generaron {len(creados)} cobros pendientes correctamente.")
+    return redirect("finanzas:bandeja_cobros")

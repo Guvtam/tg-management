@@ -6,7 +6,7 @@ from django.utils import timezone
 from .models import Cobro
 from .plan_cobros import previsualizar_plan
 from .confirmar_cobros import confirmar_plan_cobros
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib import messages
@@ -541,6 +541,7 @@ def confirmar_cobros_cotizacion(request, cotizacion_pk):
     return redirect("finanzas:bandeja_cobros")
 
 
+@require_GET
 def detalle_cobro_publico(request, token):
     """Consulta pública de solo lectura mediante un token aleatorio no enumerables."""
     cobro = get_object_or_404(

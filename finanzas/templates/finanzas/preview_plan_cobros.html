@@ -37,6 +37,9 @@
       </tbody>
     </table>
   </div>
+  {% if plan_existente %}
+  <p role="alert">Esta cotización ya tiene ingresos asociados. Para evitar duplicados no se puede generar otro calendario.</p>
+  {% else %}
   <form method="post" action="{% url 'finanzas:confirmar_cobros_cotizacion' cotizacion.pk %}">
     {% csrf_token %}
     <input type="hidden" name="inicio" value="{{ fecha_texto }}">
@@ -44,6 +47,7 @@
     <p>Al confirmar se crearán ingresos y cobros pendientes. Esta operación no procesa pagos ni envía enlaces.</p>
     <button type="submit" class="boton">Confirmar y generar cobros</button>
   </form>
+  {% endif %}
 </div>
 {% endif %}
 {% endblock %}
